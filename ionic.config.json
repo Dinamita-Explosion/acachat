@@ -1,0 +1,5 @@
+{
+  "name": "ionic-angular-tailwindcss-starter",
+  "type": "angular",
+  "npmClient": "pnpm"
+}

@@ -1,0 +1,89 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary" class="bg-blue-600">
+    <ion-title class="text-white font-semibold" i18n="@@login-title">Iniciar Sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="bg-gray-50">
+  <div class="flex min-h-full items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8">
+      <div class="text-center">
+        <ion-icon name="chatbox-ellipses" class="text-6xl text-blue-600 mb-4"></ion-icon>
+        <h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900" i18n="@@app-name">
+          Chatbot Institucional
+        </h2>
+        <p class="mt-2 text-sm text-gray-600" i18n="@@login-subtitle">
+          Inicia sesión en tu cuenta
+        </p>
+      </div>
+
+      <form class="mt-8 space-y-6" (ngSubmit)="onLogin()">
+        <div class="space-y-4">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <ion-input
+              type="email"
+              placeholder="Correo electrónico"
+              i18n-placeholder="@@email-placeholder"
+              [(ngModel)]="email"
+              name="email"
+              required
+              fill="outline"
+              class="w-full">
+              <ion-icon name="mail-outline" slot="start" class="text-gray-400"></ion-icon>
+            </ion-input>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <ion-input
+              type="password"
+              placeholder="Contraseña"
+              i18n-placeholder="@@password-placeholder"
+              [(ngModel)]="password"
+              name="password"
+              required
+              fill="outline"
+              class="w-full">
+              <ion-icon name="lock-closed-outline" slot="start" class="text-gray-400"></ion-icon>
+            </ion-input>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between px-2">
+          <div class="flex items-center">
+            <ion-checkbox id="remember-me" class="mr-2"></ion-checkbox>
+            <ion-label for="remember-me" class="text-sm text-gray-600">
+              Recordarme
+            </ion-label>
+          </div>
+
+          <div class="text-sm">
+            <a href="#" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <app-button
+            type="submit"
+            variant="primary"
+            size="lg"
+            [fullWidth]="true">
+            Iniciar Sesión
+          </app-button>
+
+          <div class="text-center border-t border-gray-200 pt-4">
+            <span class="text-sm text-gray-600">¿No tienes una cuenta?</span>
+            <app-button
+              variant="ghost"
+              size="sm"
+              (buttonClick)="goToRegister()"
+              class="ml-1">
+              Regístrate aquí
+            </app-button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</ion-content>
