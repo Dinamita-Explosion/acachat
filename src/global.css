@@ -35,3 +35,49 @@
  * https://tailwindcss.com
  */
 @import 'tailwindcss';
+
+/* Poppins Font Import */
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/500.css';
+@import '@fontsource/poppins/600.css';
+@import '@fontsource/poppins/700.css';
+
+/* Custom Color Variables for Tailwind CSS v4 */
+@theme {
+  --color-primary: #4a3aff;
+  --color-secondary: #000000;
+
+  --color-neutral-300: #eff0f6;
+  --color-neutral-700: #4e4b66;
+  --color-neutral-800: #170f49;
+
+  --color-brand-50: #f7f9ff;
+  --color-brand-100: #f1f4ff;
+  --color-brand-200: #ebebeb;
+  --color-brand-300: #eff0f6;
+  --color-brand-700: #4e4b66;
+  --color-brand-800: #170f49;
+  --color-brand-900: #000000;
+
+  --font-family-sans: 'Poppins', ui-sans-serif, system-ui;
+}
+
+/* Force Poppins globally */
+* {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+@media (min-width: 1024px) {
+  ion-app {
+    background: #000;
+  }
+
+  ion-router-outlet {
+    max-width: 428px;
+    margin: 16px auto;
+    min-height: calc(100vh - 32px);
+    background: var(--ion-background-color);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+}

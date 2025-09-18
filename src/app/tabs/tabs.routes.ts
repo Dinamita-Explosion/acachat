@@ -15,10 +15,6 @@ export const routes: Routes = [
         loadChildren: () => import('../home/tab2/tab2.routes'),
       },
       {
-        path: 'tab3',
-        loadChildren: () => import('../home/tab3/tab3.routes'),
-      },
-      {
         path: '',
         redirectTo: '/tabs/tab1',
         pathMatch: 'full',

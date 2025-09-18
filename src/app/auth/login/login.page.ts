@@ -3,22 +3,24 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { ButtonComponent } from '../../components/button/button.component';
+import { FormInputComponent } from '../../components/form-input/form-input.component';
+import { ThemedButtonComponent } from '../../components/themed-button/themed-button.component';
+import { TextTitleComponent } from '../../components/text-title/text-title.component';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ButtonComponent],
+  imports: [IonicModule, CommonModule, FormsModule, FormInputComponent, ThemedButtonComponent, TextTitleComponent],
 })
 export class LoginPage {
-  email: string = '';
-  password: string = '';
+  email = '';
+  password = '';
 
   constructor(private router: Router) {}
 
   async onLogin() {
-    console.log('Login attempt:', { email: this.email, password: this.password });
+    this.router.navigate(['/tabs/tab1']);
   }
 
   goToRegister() {

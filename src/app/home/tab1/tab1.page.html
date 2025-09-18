@@ -1,17 +1,50 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Tab 1</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="bg-white">
+  <!-- Topbar como componente -->
+  <app-topbar [logoSrc]="logoSrc" [avatarSrc]="avatarSrc"></app-topbar>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Contenido -->
+  <div class="p-4">
+    <!-- Saludo con texto más grueso -->
+    <h1 class="text-2xl font-bold text-primary">¡Hola, Nicolás!</h1>
+    <p class="text-md text-brand-700 mt-1 font-light">¡Qué bueno volver a verte! :)</p>
+  </div>
 
-  <div class="grid min-h-full place-content-center">
-    <h1>Hello, Tab 1!</h1>
+  <!-- Tarjetas: mismo alto que placeholders (h-32). 1 full + 2 en una fila -->
+  <div class="p-4 space-y-4">
+    <!-- Curso (única tarjeta de curso) -->
+    <div class="flex h-32 items-center justify-between rounded-2xl bg-neutral-800 p-4 shadow-md">
+      <div>
+        <div class="text-xs font-semibold uppercase tracking-wide text-white/70">Curso</div>
+        <div class="mt-1 text-2xl font-bold text-white">1° Medio A</div>
+      </div>
+      <ion-icon name="school-outline" class="text-brand-50 text-3xl"></ion-icon>
+    </div>
+
+    <!-- Fila con 2 tarjetas -->
+    <div class="grid grid-cols-2 gap-3">
+      <!-- Clima -->
+      <div class="flex h-32 flex-col justify-between rounded-2xl bg-neutral-800 p-4 shadow-md">
+        <div class="flex items-center justify-between">
+          <div class="text-xs font-semibold uppercase tracking-wide text-white/70">Clima</div>
+          <ion-icon name="sunny-outline" class="text-brand-50 text-xl"></ion-icon>
+        </div>
+        <div>
+          <div class="text-lg font-bold text-white">22°C · Soleado</div>
+          <div class="text-xs text-white/70">Santiago · Viento 6 km/h</div>
+        </div>
+      </div>
+
+      <!-- Día -->
+      <div class="flex h-32 flex-col justify-between rounded-2xl bg-neutral-800 p-4 shadow-md">
+        <div class="flex items-center justify-between">
+          <div class="text-xs font-semibold uppercase tracking-wide text-white/70">Día</div>
+          <ion-icon name="calendar-outline" class="text-brand-50 text-xl"></ion-icon>
+        </div>
+        <div>
+          <div class="text-lg font-bold text-white">{{ today | date: 'EEEE' | titlecase }}</div>
+          <div class="text-xs text-white/70">{{ today | date: 'd MMMM, y' }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 </ion-content>

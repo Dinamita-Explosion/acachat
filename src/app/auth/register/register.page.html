@@ -1,134 +1,120 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary" class="bg-blue-600">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/auth/login" class="text-white"></ion-back-button>
-    </ion-buttons>
-    <ion-title class="text-white font-semibold">Crear Cuenta</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" [scrollY]="false" class="bg-white">
+  <div class="relative mx-auto flex h-full w-full items-center justify-center px-4 py-8 sm:px-6">
+    <div class="pointer-events-none absolute inset-0 -z-10 hidden overflow-hidden sm:block">
+      <div
+        class="absolute -top-[12vw] -right-[10vw] size-[40vw] rounded-full border-2 border-brand-50 sm:top-[-6rem] sm:right-[-5rem] sm:size-64 md:size-72 lg:size-80"></div>
+      <div
+        class="absolute -bottom-[10vw] -left-[10vw] size-[32vw] rotate-12 border-2 border-brand-100 sm:bottom-[-6rem] sm:left-[-6rem] sm:size-56 md:size-64"></div>
+    </div>
 
-<ion-content [fullscreen]="true" class="bg-gray-50">
-  <div class="flex min-h-full items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-8">
-      <div class="text-center">
-        <ion-icon name="person-add" class="text-6xl text-blue-600 mb-4"></ion-icon>
-        <h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900">
-          Crear Nueva Cuenta
-        </h2>
-        <p class="mt-2 text-sm text-gray-600">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-4 sm:p-6">
+      <div class="mb-6 text-center sm:mb-8">
+        <app-text-title [text]="'Crear Cuenta'"></app-text-title>
+        <p class="mt-2 text-sm font-medium leading-snug text-neutral-800/80 sm:text-base">
           Únete al Chatbot Institucional
         </p>
       </div>
 
-      <form class="mt-8 space-y-6" (ngSubmit)="onRegister()">
-        <div class="space-y-4">
+      <form class="space-y-4" (ngSubmit)="onRegister()">
+        <div class="space-y-3 -mx-4 sm:mx-0">
+          <app-form-input
+            name="username"
+            placeholder="Nombre de usuario"
+            icon="person-outline"
+            [required]="true"
+            [(ngModel)]="username"></app-form-input>
+
+          <app-form-input
+            name="rut"
+            placeholder="RUT"
+            icon="id-card-outline"
+            [required]="true"
+            [(ngModel)]="rut"></app-form-input>
+
+          <app-form-input
+            name="email"
+            type="email"
+            placeholder="Correo Electrónico"
+            icon="mail-outline"
+            autocomplete="email"
+            [required]="true"
+            [(ngModel)]="email"></app-form-input>
+
           <div class="grid grid-cols-2 gap-3">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <ion-input
-                type="text"
-                placeholder="Nombre"
-                [(ngModel)]="firstName"
-                name="firstName"
-                required
-                fill="outline"
-                class="w-full">
-                <ion-icon name="person-outline" slot="start" class="text-gray-400"></ion-icon>
-              </ion-input>
-            </div>
+            <app-form-select
+              name="region"
+              placeholder="Región"
+              icon="location-outline"
+              [required]="true"
+              [options]="regions"
+              [(ngModel)]="region"></app-form-select>
 
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <ion-input
-                type="text"
-                placeholder="Apellido"
-                [(ngModel)]="lastName"
-                name="lastName"
-                required
-                fill="outline"
-                class="w-full">
-                <ion-icon name="person-outline" slot="start" class="text-gray-400"></ion-icon>
-              </ion-input>
-            </div>
+            <app-form-select
+              name="comuna"
+              placeholder="Comuna"
+              icon="business-outline"
+              [required]="true"
+              [options]="comunas"
+              [(ngModel)]="comuna"></app-form-select>
           </div>
 
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <ion-input
-              type="email"
-              placeholder="Correo electrónico"
-              [(ngModel)]="email"
-              name="email"
-              required
-              fill="outline"
-              class="w-full">
-              <ion-icon name="mail-outline" slot="start" class="text-gray-400"></ion-icon>
-            </ion-input>
-          </div>
+          <app-form-input
+            name="password"
+            type="password"
+            placeholder="Contraseña"
+            icon="lock-closed-outline"
+            autocomplete="new-password"
+            [required]="true"
+            [(ngModel)]="password"></app-form-input>
 
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <ion-input
-              type="password"
-              placeholder="Contraseña"
-              [(ngModel)]="password"
-              name="password"
-              required
-              fill="outline"
-              class="w-full">
-              <ion-icon name="lock-closed-outline" slot="start" class="text-gray-400"></ion-icon>
-            </ion-input>
-          </div>
+          <app-form-input
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirmación de Contraseña"
+            icon="lock-closed-outline"
+            autocomplete="new-password"
+            [required]="true"
+            [(ngModel)]="confirmPassword"></app-form-input>
+        </div>
 
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <ion-input
-              type="password"
-              placeholder="Confirmar contraseña"
-              [(ngModel)]="confirmPassword"
-              name="confirmPassword"
-              required
-              fill="outline"
-              class="w-full">
-              <ion-icon name="lock-closed-outline" slot="start" class="text-gray-400"></ion-icon>
-            </ion-input>
+        <div class="flex items-start px-0 sm:px-2">
+          <ion-checkbox [(ngModel)]="acceptTerms" name="acceptTerms" class="mr-3"></ion-checkbox>
+          <div class="text-sm text-neutral-800">
+            Acepto los
+            <button type="button" (click)="isTermsOpen = true" class="font-semibold hover:underline" style="color: var(--color-primary)">
+              términos y condiciones
+            </button>
+            y la
+            <button type="button" (click)="isPrivacyOpen = true" class="font-semibold hover:underline" style="color: var(--color-primary)">
+              política de privacidad
+            </button>
           </div>
         </div>
 
-        <div class="flex items-start px-2">
-          <div class="flex items-center h-5">
-            <ion-checkbox id="terms" class="mr-3"></ion-checkbox>
-          </div>
-          <div class="text-sm">
-            <ion-label for="terms" class="text-gray-600">
-              Acepto los
-              <a href="#" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
-                términos y condiciones
-              </a>
-              y la
-              <a href="#" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
-                política de privacidad
-              </a>
-            </ion-label>
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <app-button
-            type="submit"
-            variant="primary"
-            size="lg"
-            [fullWidth]="true">
-            Crear Cuenta
-          </app-button>
-
-          <div class="text-center border-t border-gray-200 pt-4">
-            <span class="text-sm text-gray-600">¿Ya tienes una cuenta?</span>
-            <app-button
-              variant="ghost"
-              size="sm"
-              (buttonClick)="goToLogin()"
-              class="ml-1">
-              Inicia sesión aquí
-            </app-button>
+        <div class="space-y-4 pt-1">
+          <app-themed-button type="submit" variant="primary">Crear cuenta</app-themed-button>
+          <div class="border-t border-brand-100 pt-4">
+            <app-themed-button type="button" variant="secondary" (clicked)="goToLogin()">
+              ¿Ya tienes una cuenta? Inicia sesión
+            </app-themed-button>
           </div>
         </div>
       </form>
     </div>
   </div>
 </ion-content>
+
+<!-- Modals -->
+<app-legal-modal
+  [isOpen]="isTermsOpen"
+  (closed)="isTermsOpen = false"
+  title="Términos y Condiciones"
+  src="assets/legal/terms.html"
+></app-legal-modal>
+
+<app-legal-modal
+  [isOpen]="isPrivacyOpen"
+  (closed)="isPrivacyOpen = false"
+  title="Política de Privacidad"
+  src="assets/legal/privacy.html"
+></app-legal-modal>

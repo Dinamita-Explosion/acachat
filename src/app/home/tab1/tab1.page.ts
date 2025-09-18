@@ -1,9 +1,21 @@
 import { Component } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { CommonModule } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { schoolOutline, sunnyOutline, calendarOutline } from 'ionicons/icons';
+import { TopbarComponent } from '../../components/topbar/topbar.component';
 
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar],
+  imports: [CommonModule, IonContent, IonIcon, TopbarComponent]
 })
-export class Tab1Page {}
+export class Tab1Page {
+  logoSrc = 'assets/branding/logo.png';
+  avatarSrc = 'assets/avatars/profile.png';
+  today = new Date();
+
+  constructor() {
+    addIcons({ schoolOutline, sunnyOutline, calendarOutline });
+  }
+}

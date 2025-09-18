@@ -1,86 +1,69 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary" class="bg-blue-600">
-    <ion-title class="text-white font-semibold" i18n="@@login-title">Iniciar Sesión</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" [scrollY]="false" class="bg-white">
+  <!-- Wrapper centers content; simplified to Tailwind defaults -->
+  <div class="relative mx-auto flex h-full w-full items-center justify-center px-4 py-8 sm:px-6">
+    <!-- Decorative shapes only on larger screens to avoid mobile clutter -->
+    <div class="pointer-events-none absolute inset-0 -z-10 hidden overflow-hidden sm:block">
+      <div
+        class="absolute -top-[12vw] -right-[10vw] size-[40vw] rounded-full border-2 border-brand-50 sm:top-[-6rem] sm:right-[-5rem] sm:size-64 md:size-72 lg:size-80"></div>
+      <div
+        class="absolute -bottom-[10vw] -left-[10vw] size-[32vw] rotate-12 border-2 border-brand-100 sm:bottom-[-6rem] sm:left-[-6rem] sm:size-56 md:size-64"></div>
+    </div>
 
-<ion-content [fullscreen]="true" class="bg-gray-50">
-  <div class="flex min-h-full items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-8">
-      <div class="text-center">
-        <ion-icon name="chatbox-ellipses" class="text-6xl text-blue-600 mb-4"></ion-icon>
-        <h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900" i18n="@@app-name">
-          Chatbot Institucional
-        </h2>
-        <p class="mt-2 text-sm text-gray-600" i18n="@@login-subtitle">
-          Inicia sesión en tu cuenta
+    <div class="w-full max-w-sm rounded-2xl bg-white p-4 sm:p-6">
+      <div class="mb-6 text-center sm:mb-8">
+        <app-text-title i18n="@@login-title" [text]="'Inicia Sesión'"></app-text-title>
+        <p class="mt-2 text-sm font-medium leading-snug text-neutral-800/80 sm:text-base">
+          ¡Bienvenido de nuevo! Te hemos extrañado.
         </p>
       </div>
 
-      <form class="mt-8 space-y-6" (ngSubmit)="onLogin()">
-        <div class="space-y-4">
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <ion-input
-              type="email"
-              placeholder="Correo electrónico"
-              i18n-placeholder="@@email-placeholder"
-              [(ngModel)]="email"
-              name="email"
-              required
-              fill="outline"
-              class="w-full">
-              <ion-icon name="mail-outline" slot="start" class="text-gray-400"></ion-icon>
-            </ion-input>
-          </div>
+      <form class="space-y-4" (ngSubmit)="onLogin()">
+        <div class="space-y-3 -mx-4 sm:mx-0">
+          <!-- Email -->
+          <app-form-input
+            name="email"
+            type="email"
+            placeholder="Email"
+            icon="mail-outline"
+            autocomplete="email"
+            [required]="true"
+            [(ngModel)]="email"></app-form-input>
 
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <ion-input
-              type="password"
-              placeholder="Contraseña"
-              i18n-placeholder="@@password-placeholder"
-              [(ngModel)]="password"
-              name="password"
-              required
-              fill="outline"
-              class="w-full">
-              <ion-icon name="lock-closed-outline" slot="start" class="text-gray-400"></ion-icon>
-            </ion-input>
-          </div>
+          <!-- Password -->
+          <app-form-input
+            name="password"
+            type="password"
+            placeholder="Password"
+            icon="lock-closed-outline"
+            autocomplete="current-password"
+            [required]="true"
+            [(ngModel)]="password"></app-form-input>
         </div>
 
-        <div class="flex items-center justify-between px-2">
-          <div class="flex items-center">
-            <ion-checkbox id="remember-me" class="mr-2"></ion-checkbox>
-            <ion-label for="remember-me" class="text-sm text-gray-600">
-              Recordarme
-            </ion-label>
-          </div>
-
-          <div class="text-sm">
-            <a href="#" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
-              ¿Olvidaste tu contraseña?
-            </a>
-          </div>
+        <div class="text-right">
+          <a
+            href="#"
+            class="text-sm font-semibold hover:underline"
+            style="color: var(--color-primary)"
+            >¿Olvidaste tu contraseña?</a
+          >
         </div>
 
-        <div class="space-y-4">
-          <app-button
-            type="submit"
-            variant="primary"
-            size="lg"
-            [fullWidth]="true">
-            Iniciar Sesión
-          </app-button>
+        <!-- Actions -->
+        <div class="space-y-4 pt-1">
+          <app-themed-button type="submit" variant="primary">Iniciar sesión</app-themed-button>
+          <app-themed-button type="button" variant="secondary" (clicked)="goToRegister()">
+            Crear cuenta
+          </app-themed-button>
+        </div>
 
-          <div class="text-center border-t border-gray-200 pt-4">
-            <span class="text-sm text-gray-600">¿No tienes una cuenta?</span>
-            <app-button
-              variant="ghost"
-              size="sm"
-              (buttonClick)="goToRegister()"
-              class="ml-1">
-              Regístrate aquí
-            </app-button>
+        <!-- Divider and Socials -->
+        <div class="mt-8 space-y-4">
+          <div class="text-center text-sm font-semibold text-primary">O continúa con</div>
+          <div class="flex items-center justify-center gap-3">
+            <app-themed-button variant="social" [iconOnly]="true" iconName="logo-google"></app-themed-button>
+            <app-themed-button variant="social" [iconOnly]="true" iconName="logo-apple"></app-themed-button>
+            <app-themed-button variant="social" [iconOnly]="true" iconName="logo-facebook"></app-themed-button>
           </div>
         </div>
       </form>
