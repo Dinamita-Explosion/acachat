@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="bg-white">
   <app-topbar [logoSrc]="logoSrc" [avatarSrc]="avatarSrc"></app-topbar>
 
-  <div class="p-4 space-y-4">
+  <div class="px-4 py-3 space-y-4">
     <app-course-card
       *ngFor="let c of courses"
       [emoji]="c.emoji"

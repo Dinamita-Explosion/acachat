@@ -1,19 +1,13 @@
 import { Component, inject } from '@angular/core';
-import {
-  IonButton,
-  IonContent,
-  IonFooter,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonToolbar,
-} from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonToolbar } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { send, trashOutline } from 'ionicons/icons';
+import { send, trashOutline, ellipsisHorizontal, chevronBack } from 'ionicons/icons';
 import { TopbarComponent } from '../components/topbar/topbar.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { NavController } from '@ionic/angular';
 
 interface ChatMessage {
   id: number;
@@ -33,6 +27,7 @@ interface ChatMessage {
     IonButton,
     IonContent,
     IonFooter,
+    IonHeader,
     IonIcon,
     IonInput,
     IonItem,
@@ -41,7 +36,7 @@ interface ChatMessage {
 })
 export class ChatPage {
 
-  API_KEY = ''; /* Aqui va la apiKey de OpenAI */
+  API_KEY = 'AIzaSyCBndl8Lvpw_1N7_DMJjJ9uRDiBjjEm1dk'; /* Aqui va la apiKey de OpenAI */
   MODEL = 'models/gemma-3-1b-it';
 
   messages: ChatMessage[] = [
@@ -53,10 +48,44 @@ export class ChatPage {
   systemPrompt = 'Eres un asistente útil y conciso que responde en español con un tono institucional cercano.';
   temperature = 0.6;
   maxOutputTokens = 2048;
-    private readonly sanitizer = inject(DomSanitizer);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly router = inject(Router);
+  private readonly nav = inject(NavController);
+
+  // Header props (populated from navigation state)
+  headerTitle: string = 'Chatbot';
+  headerSubtitle?: string;
+  headerColor: string = 'var(--color-primary)';
+  headerEmoji: string = '🤖';
 
   constructor() {
-    addIcons({ send, trashOutline });
+    addIcons({ send, trashOutline, ellipsisHorizontal, chevronBack });
+
+    const navState = this.router.getCurrentNavigation()?.extras?.state as any;
+    if (navState) {
+      this.headerTitle = navState.title || this.headerTitle;
+      this.headerSubtitle = navState.subtitle || this.headerSubtitle;
+      this.headerColor = navState.color || this.headerColor;
+      this.headerEmoji = navState.emoji || this.headerEmoji;
+    }
+  }
+
+  openOptions() {
+    // Placeholder para acciones del header (configuración, limpiar, etc.)
+    console.log('Opciones del chat');
+  }
+
+  handleBack() {
+    try {
+      // Si hay historial, vuelve. Si no, navega a Tab2 por defecto
+      if (window.history.length > 1) {
+        this.nav.back();
+      } else {
+        this.router.navigate(['/tabs/tab2']);
+      }
+    } catch {
+      this.router.navigate(['/tabs/tab2']);
+    }
   }
 
   sendMessage() {
