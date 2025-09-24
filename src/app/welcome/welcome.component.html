@@ -1,0 +1,45 @@
+<ion-content [fullscreen]="true" [scrollY]="false" class="bg-white">
+  <!-- Wrapper centers content -->
+  <div class="relative mx-auto flex h-full w-full flex-col items-center justify-center px-6 py-8">
+
+    <!-- Main content container -->
+    <div class="w-full max-w-sm text-center space-y-8">
+
+      <!-- Illustration/Image -->
+      <div class="flex justify-center mb-8">
+        <div class="w-64 h-64 bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl flex items-center justify-center">
+          <!-- Placeholder for illustration - you can replace with actual image -->
+          <div class="text-6xl">
+            👨‍💻
+          </div>
+        </div>
+      </div>
+
+      <!-- Title Section -->
+      <div class="space-y-4">
+        <app-text-title [text]="'Lorem ipsum'"></app-text-title>
+        <p class="text-base font-medium leading-relaxed text-neutral-600 px-4">
+          Explora todas las oportunidades de aprendizaje existentes basadas en tus intereses.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 pt-8 justify-center">
+        <app-themed-button
+          variant="primary"
+          expand="default"
+          (clicked)="goToLogin()">
+          Iniciar Sesión
+        </app-themed-button>
+
+        <app-themed-button
+          variant="secondary"
+          expand="default"
+          (clicked)="goToRegister()">
+          Registrarse
+        </app-themed-button>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

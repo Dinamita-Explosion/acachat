@@ -51,7 +51,7 @@
 
         <!-- Actions -->
         <div class="space-y-4 pt-1">
-          <app-themed-button type="submit" variant="primary">Iniciar sesión</app-themed-button>
+          <app-themed-button type="button" variant="primary" (clicked)="onLogin()">Iniciar sesión</app-themed-button>
           <app-themed-button type="button" variant="secondary" (clicked)="goToRegister()">
             Crear cuenta
           </app-themed-button>

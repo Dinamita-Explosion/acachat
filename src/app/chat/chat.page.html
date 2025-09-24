@@ -1,14 +1,42 @@
-<ion-content [fullscreen]="true" class="bg-white">
-  <!-- Simple header with title -->
-  <div class="px-4 pt-5 pb-3" style="padding-top: calc(env(safe-area-inset-top) + 8px)">
-    <div class="flex items-center justify-center">
-      <h1 class="text-lg font-semibold text-primary">Chatbot</h1>
+<ion-header [translucent]="false" class="bg-white no-shadow">
+  <ion-toolbar class="bg-white" style="--background:#fff; --border-color: var(--color-brand-100); --border-width: 0 0 1px 0; box-shadow:none; -webkit-box-shadow:none;">
+    <div class="px-4 pt-5 pb-3">
+      <div class="flex w-full items-center gap-3">
+        <ion-button
+          fill="clear"
+          class="m-0 h-9 w-9 rounded-full bg-[color:var(--color-neutral-300)] text-neutral-800"
+          (click)="handleBack()"
+        >
+          <ion-icon name="chevron-back" slot="icon-only"></ion-icon>
+        </ion-button>
+
+        <span
+          class="inline-flex h-8 w-8 items-center justify-center rounded-full text-base"
+          [style.background]="headerColor"
+          [style.color]="'#fff'"
+        >
+          {{ headerEmoji || '🤖' }}
+        </span>
+
+        <div class="flex min-w-0 flex-col leading-tight">
+          <span class="truncate text-[16px] font-semibold text-neutral-900">{{ headerTitle || 'Chatbot' }}</span>
+          <span *ngIf="headerSubtitle" class="truncate text-[11px] text-brand-700">{{ headerSubtitle }}</span>
+        </div>
+
+        <ion-button
+          fill="clear"
+          class="ml-auto m-0 h-9 w-9 rounded-full bg-[color:var(--color-neutral-300)] text-neutral-800"
+          (click)="openOptions()"
+        >
+          <ion-icon name="ellipsis-horizontal" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
     </div>
-    <div class="mt-2 h-px w-full bg-brand-100"></div>
-  </div>
+  </ion-toolbar>
+</ion-header>
 
-  <!-- Settings panel removed from UI (configured in TS) -->
-
+<ion-content [fullscreen]="false" class="bg-white">
+  <!-- Settings panel removed from UI (configurada en TS) -->
   <div class="px-4 py-3 space-y-3">
     <div
       *ngFor="let msg of messages"
@@ -17,7 +45,7 @@
       [class.justify-start]="msg.from !== 'user'"
     >
       <div
-        class="inline-block max-w-[85%] rounded-2xl px-4 py-2 shadow-sm ring-1"
+        class="inline-block max-w-[85%] rounded-2xl px-4 py-2 ring-1"
         [class.bg-primary]="msg.from === 'user'"
         [class.text-white]="msg.from === 'user'"
         [class.ring-transparent]="msg.from === 'user'"
@@ -35,8 +63,8 @@
 
 </ion-content>
 
-<ion-footer class="bg-white">
-  <div class="px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+14px)]">
+<ion-footer class="bg-white no-shadow" [style.box-shadow]="'none'" [style.border-top]="'0'" [style.--border-color]="'transparent'" [style.filter]="'none'">
+  <div class="px-4 pt-3 pb-[calc(var(--ion-safe-area-bottom,env(safe-area-inset-bottom))+14px)]">
     <div class="mx-auto flex max-w-sm items-center gap-3">
       <!-- Clear button (black) -->
       <ion-button
@@ -55,12 +83,15 @@
       </ion-button>
 
       <!-- Input pill -->
-      <div class="flex h-[44px] flex-1 items-center rounded-full bg-neutral-300 px-4 transition focus-within:ring-2 focus-within:ring-primary">
+      <div class="flex h-[44px] flex-1 items-center rounded-full bg-neutral-300 px-4 transition-colors border border-transparent focus-within:border-[color:var(--color-brand-100)]">
         <ion-input
           [(ngModel)]="draft"
           [clearInput]="true"
           placeholder="Escribe un mensaje..."
           class="w-full bg-transparent"
+          [style.--highlight-color-focused]="'transparent'"
+          [style.--highlight-color]="'transparent'"
+          [style.--border-color]="'transparent'"
           enterkeyhint="send"
           (keyup.enter)="sendMessage()"
         ></ion-input>
@@ -83,5 +114,5 @@
       </ion-button>
     </div>
   </div>
-  
+
 </ion-footer>

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { TopbarComponent } from '../../components/topbar/topbar.component';
 import { CourseCardComponent } from '../../components/course-card/course-card.component';
 
@@ -12,6 +13,8 @@ import { CourseCardComponent } from '../../components/course-card/course-card.co
 export class Tab2Page {
   logoSrc = 'assets/branding/logo.png';
   avatarSrc = 'assets/avatars/profile.png';
+
+  constructor(private router: Router) {}
 
   courses = [
     {
@@ -49,7 +52,14 @@ export class Tab2Page {
   ];
 
   onOpenCourse(course: any) {
-    console.log('Abrir curso:', course);
-    // TODO: Navegar al detalle del curso cuando exista la ruta
+    // Navega a /chat pasando estado para personalizar el header
+    this.router.navigate(['/chat'], {
+      state: {
+        title: course?.title || 'Chatbot',
+        subtitle: course?.professor || '',
+        color: course?.color || '#4a3aff',
+        emoji: course?.emoji || '🤖',
+      },
+    });
   }
 }

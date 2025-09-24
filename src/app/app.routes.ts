@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'auth',
+    loadComponent: () => import('./welcome/welcome.component').then(m => m.WelcomeComponent),
     pathMatch: 'full',
   },
   {
@@ -15,7 +15,7 @@ export const routes: Routes = [
     loadChildren: () => import('./chat/chat.routes'),
   },
   {
-    path: '',
+    path: 'tabs',
     loadChildren: () => import('./tabs/tabs.routes'),
   },
 ];
