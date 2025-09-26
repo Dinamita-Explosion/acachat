@@ -1,32 +1,23 @@
-
+<img src="./src/assets/icon/readmeicon.png" alt="logo" width="100" />
 
 # Acachat 
 
-![Descripción de la imagen](./src/assets/icon/readmeicon.png)
-
----
-
-## Presentado por:
+**Presentado por:**
 - Giovanni Ahumada
 - Matías Díaz
 - Daniel Saavedra
 
----
-
 ##  Índice
 1. [Resumen del Proyecto](#resumen-del-proyecto)
 2. [Requerimientos](#requerimientos)
-3. [Arquitectura de la Información](#arquitectura-de-la-información)
+3. [Librerias usadas con Angular](#librerias-usadas-con-angular)
 3. [Diseño de prototipos](#diseño-de-prototipos)
-4. [Librerías en Angular](#liberías-usadas-con-angular)
-
----
+4. [Tecnologías](#tecnologías)
 
 ## Resumen del proyecto
 
-**Acachat** es una aplicación móvil cuya finalidad es ofrecer y hacer mas amigable el uso de IA's generativas (LLM) dentro de establecimientos academicos, ofreciendo 
+**Acachat** es una aplicación móvil cuya finalidad es ofrecer y hacer mas amigable el uso de IA's generativas (LLM) dentro de establecimientos academicos, ofreciendo un uso personalizado para estudiantes y profesores, con contenido creado y diseñado para cada asignatura.
 
----
 
 ## Requerimientos
 
@@ -71,8 +62,6 @@
 
  ![@angular/localize](https://img.shields.io/badge/@angular%2Flocalize-EE2F2F?style=flat&logo=angular&logoColor=white) <br> Utilizado para generar una traducción al texto implementado en las vistas.
 
----
-
 ## Diseño de prototipos
 
 <div align="center">
@@ -80,14 +69,10 @@
 [![Figma](https://img.shields.io/badge/Figma-000000?style=flat&logo=figma&logoColor=white)](#)  
 </div>
 
----
-
 ## Tecnologías
 <div align="center">
 
-![Ionic](https://img.shields.io/badge/Ionic-3880FF?style=flat&logo=ionic&logoColor=white)
-![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat&logo=angular&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white)
+[![Ionic](https://img.shields.io/badge/Ionic-3880FF?style=flat&logo=ionic&logoColor=white)](#)
+[![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat&logo=angular&logoColor=white)](#)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white)](#)
 </div>
-
----
