@@ -23,28 +23,25 @@
 
 ### Roles del sistema
 
-- **Administrador**: Tiene control total del sistema.
-- **Profesor**: Puede agregar, eliminar y modificar nuevos cursos y añadir o quitar estudiantes de los cursos.
-- **Estudiante**: Puede ver los cursos que se le asignaron y usar el chat de los cursos.
+- **Profesor**: Puede gestionar los documentos usados en cada matería donde imparte.
+- **Estudiante**: Puede ver los materías que se le asignaron y usar el chat de los cursos.
 
 ### Requerimientos Funcionales por Rol
 
-#### Rol-Administrador
-
-- **RF-ADM-01**: El administrador puede gestionar usuarios y asignar roles.
-- **RF-ADM-02**: El administrador puede cambiar las instituciones acádemicas de los usuarios.
-- **RF-ADM-03**: El administrador puede gestionar las intituciones acádemicas asociadas.
-
 #### Rol-Profesor
 
-- **RF-PRO-01**: El profesor puede gestionar cursos.
-- **RF-PRO-02**: El profesor puede asignar estudiantes a uno o a más cursos.
+- **RF-PRO-01**: El profesor puede visualizar las materías donde imparte clases.
+- **RF-PRO-02**: El profesor puede ver el listado de estudiantes de una matería en específico.
 - **RF-PRO-03**: El profesor puede gestionar el material que usará el chatbot.
+- **RF-PRO-04**: El profesor puede filtrar palabras o frases que no se podrán usar dentro de los chats de una matería en específico.
+- **RF-PRO-05**: El profesor puede ocultar el chat de una matería en específico a los estudiantes inscritos.
 
 #### Rol-Estudiante
 
-- **RF-EST-01**: El estudiante puede visualizar los cursos en los que está inscrito.
-- **RF-EST-02**: El estudiante puede chatear con el chatbot asignado a un curso.
+- **RF-EST-01**: El estudiante puede visualizar las materías en los que está inscrito.
+- **RF-EST-02**: El estudiante puede conversar con el chatbot asignado a un curso.
+- **RF-EST-03**: El estudiante puede vaciar el chat de una matería en específico.
+- **RF-EST-04**: El estudiante puede exportar a un texto el chat de una matería en específico.
 
 ### Requerimientos No Funcionales
 
@@ -66,7 +63,7 @@
 
 <div align="center">
 
-[![Figma](https://img.shields.io/badge/Figma-000000?style=flat&logo=figma&logoColor=white)](#)  
+[![Figma](https://img.shields.io/badge/Figma-000000?style=flat&logo=figma&logoColor=white)](https://www.figma.com/design/1GNS37vGlElebS0W7YCuaH/WyM?node-id=48-324&t=DrgJfPm5505lGtZ7-1)  
 </div>
 
 ## Tecnologías
