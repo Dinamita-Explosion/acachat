@@ -26,7 +26,11 @@
 
 /* @import '@ionic/angular/css/palettes/dark.always.css'; */
 /* @import '@ionic/angular/css/palettes/dark.class.css'; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* Modo claro forzado: no importamos paletas que reaccionen al sistema */
+
+:root {
+  color-scheme: light;
+}
 
 /*
  * Tailwind CSS

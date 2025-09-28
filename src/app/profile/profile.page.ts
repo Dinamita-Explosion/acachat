@@ -28,4 +28,6 @@ export class ProfilePage {
   goBack() {
     this.router.navigate(['/tabs/tab1']);
   }
+
+  onSettings() {}
 }
