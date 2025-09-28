@@ -15,6 +15,10 @@ export const routes: Routes = [
         loadChildren: () => import('../home/tab2/tab2.routes'),
       },
       {
+        path: 'profile',
+        loadChildren: () => import('../profile/profile.routes'),
+      },
+      {
         path: '',
         redirectTo: '/tabs/tab1',
         pathMatch: 'full',

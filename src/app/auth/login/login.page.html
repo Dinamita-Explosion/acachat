@@ -50,7 +50,7 @@
         </div>
 
         <!-- Actions -->
-        <div class="space-y-4 pt-1">
+        <div class="grid gap-4 pt-1">
           <app-themed-button type="button" variant="primary" (clicked)="onLogin()">Iniciar sesión</app-themed-button>
           <app-themed-button type="button" variant="secondary" (clicked)="goToRegister()">
             Crear cuenta
@@ -61,9 +61,14 @@
         <div class="mt-8 space-y-4">
           <div class="text-center text-sm font-semibold text-primary">O continúa con</div>
           <div class="flex items-center justify-center gap-3">
-            <app-themed-button variant="social" [iconOnly]="true" iconName="logo-google"></app-themed-button>
-            <app-themed-button variant="social" [iconOnly]="true" iconName="logo-apple"></app-themed-button>
-            <app-themed-button variant="social" [iconOnly]="true" iconName="logo-facebook"></app-themed-button>
+            <app-themed-button
+              variant="social"
+              [iconOnly]="true"
+              iconName="assets/icon/google-icon.svg"></app-themed-button>
+            <app-themed-button
+              variant="social"
+              [iconOnly]="true"
+              iconName="assets/icon/apple.svg"></app-themed-button>
           </div>
         </div>
       </form>

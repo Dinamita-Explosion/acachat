@@ -63,13 +63,13 @@ export class CourseCardComponent {
     return `linear-gradient(180deg, ${c} 0%, color-mix(in srgb, ${c} 80%, black) 100%)`;
   }
 
-  get emojiStyle() {
+  get emojiStyle(): Record<string, string> {
     const c = this.color?.trim() || '#4a3aff';
     if (c.startsWith('#')) {
       const [r, g, b] = this.hexToRgb(c);
-      return { borderColor: `rgba(${r}, ${g}, ${b}, 0.5)` } as any;
+      return { borderColor: `rgba(${r}, ${g}, ${b}, 0.5)` };
     }
-    return { borderColor: `color-mix(in srgb, ${c} 50%, white)` } as any;
+    return { borderColor: `color-mix(in srgb, ${c} 50%, white)` };
   }
 
   private hexToRgb(hex: string): [number, number, number] {

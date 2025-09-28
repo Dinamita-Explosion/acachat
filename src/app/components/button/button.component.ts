@@ -13,9 +13,9 @@ export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 export class ButtonComponent {
   @Input() variant: ButtonVariant = 'primary';
   @Input() size: ButtonSize = 'md';
-  @Input() disabled: boolean = false;
-  @Input() loading: boolean = false;
-  @Input() fullWidth: boolean = false;
+  @Input() disabled = false;
+  @Input() loading = false;
+  @Input() fullWidth = false;
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
   @Input() icon?: string;
   @Input() iconPosition: 'left' | 'right' = 'left';

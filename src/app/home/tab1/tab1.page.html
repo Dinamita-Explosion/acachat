@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true" class="bg-white">
   <!-- Topbar como componente -->
-  <app-topbar [logoSrc]="logoSrc" [avatarSrc]="avatarSrc"></app-topbar>
+  <app-topbar [logoSrc]="logoSrc" [avatarSrc]="avatarSrc" (avatarClicked)="goToProfile()"></app-topbar>
 
   <!-- Contenido -->
   <div class="px-4 py-3">

@@ -10,6 +10,5 @@ import { CommonModule } from '@angular/common';
   `,
 })
 export class TextTitleComponent {
-  @Input() text: string = '';
+  @Input() text = '';
 }
-

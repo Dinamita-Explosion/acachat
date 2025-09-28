@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
-export interface SelectOption<T = any> {
+export interface SelectOption<T = string> {
   label: string;
   value: T;
 }
@@ -31,7 +31,7 @@ export interface SelectOption<T = any> {
           [disabled]="disabled"
           [required]="required"
           [name]="name"
-          [value]="value ?? ''"
+          [value]="value"
           (change)="onChangeSelect($event)"
           (blur)="onTouched()">
           <option value="" disabled selected hidden>{{ placeholder }}</option>
@@ -44,24 +44,24 @@ export interface SelectOption<T = any> {
 })
 export class FormSelectComponent implements ControlValueAccessor {
   @Input() name?: string;
-  @Input() placeholder: string = '';
+  @Input() placeholder = '';
   @Input() icon?: string;
-  @Input() required: boolean = false;
-  @Input() disabled: boolean = false;
+  @Input() required = false;
+  @Input() disabled = false;
   @Input() options: SelectOption[] = [];
 
-  value: any = '';
+  value = '';
 
-  private onChange: (val: any) => void = () => {};
-  onTouched: () => void = () => {};
+  private onChange: (val: string) => void = () => undefined;
+  onTouched: () => void = () => undefined;
 
-  writeValue(value: any): void {
+  writeValue(value: string | null | undefined): void {
     this.value = value ?? '';
   }
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;
   }
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
   setDisabledState(isDisabled: boolean): void {
@@ -74,4 +74,3 @@ export class FormSelectComponent implements ControlValueAccessor {
     this.onChange(this.value);
   }
 }
-
