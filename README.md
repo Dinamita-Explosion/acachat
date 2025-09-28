@@ -23,25 +23,25 @@
 
 ### Roles del sistema
 
-- **Profesor**: Puede gestionar los documentos usados en cada matería donde imparte.
-- **Estudiante**: Puede ver los materías que se le asignaron y usar el chat de los cursos.
+- **Profesor**: Puede gestionar los documentos usados en cada materia donde imparte.
+- **Estudiante**: Puede ver los materias que se le asignaron y usar el chat de los cursos.
 
 ### Requerimientos Funcionales por Rol
 
 #### Rol-Profesor
 
-- **RF-PRO-01**: El profesor puede visualizar las materías donde imparte clases.
-- **RF-PRO-02**: El profesor puede ver el listado de estudiantes de una matería en específico.
+- **RF-PRO-01**: El profesor puede visualizar las materias donde imparte clases.
+- **RF-PRO-02**: El profesor puede ver el listado de estudiantes de una materia en específico.
 - **RF-PRO-03**: El profesor puede gestionar el material que usará el chatbot.
-- **RF-PRO-04**: El profesor puede filtrar palabras o frases que no se podrán usar dentro de los chats de una matería en específico.
-- **RF-PRO-05**: El profesor puede ocultar el chat de una matería en específico a los estudiantes inscritos.
+- **RF-PRO-04**: El profesor puede filtrar palabras o frases que no se podrán usar dentro de los chats de una materia en específico.
+- **RF-PRO-05**: El profesor puede ocultar el chat de una materia en específico a los estudiantes inscritos.
 
 #### Rol-Estudiante
 
-- **RF-EST-01**: El estudiante puede visualizar las materías en los que está inscrito.
+- **RF-EST-01**: El estudiante puede visualizar las materias en los que está inscrito.
 - **RF-EST-02**: El estudiante puede conversar con el chatbot asignado a un curso.
-- **RF-EST-03**: El estudiante puede vaciar el chat de una matería en específico.
-- **RF-EST-04**: El estudiante puede exportar a un texto el chat de una matería en específico.
+- **RF-EST-03**: El estudiante puede vaciar el chat de una materia en específico.
+- **RF-EST-04**: El estudiante puede exportar a un texto el chat de una materia en específico.
 
 ### Requerimientos No Funcionales
 
@@ -49,7 +49,7 @@
 - **RNF-02:** El sitema debe ser utilizado por usuarios autenticados anteriormente.
 - **RNF-03:** El sistema debe de soportar más de mil usuarios al mismo tiempo sin pérdida notable de rendimiento.
 - **RNF-04:** El sistema debe restringir acceso de funciones según el rol.
-- **RNF-05:** La base de datos debe poder gestionar  un crecimineto de un 500% sin que el rendimineto se vea perjudicado.
+- **RNF-05:** La base de datos debe poder gestionar un crecimineto de un 500% sin que el rendimineto se vea perjudicado.
 - **RNF-06:** El sistema debe tener una interfaz intuitiva y fácil de usar.
 - **RNF-07:** El sistema debe ser capaz de realizar funciones con un ancho de banda bajo.
 
