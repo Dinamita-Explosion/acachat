@@ -16,7 +16,7 @@ export class ProfilePage {
   name = 'Nicolás Pérez';
   course = '1° Medio A';
   courseDescription = 'Plan Científico Humanista';
-  institution = 'Colegio del Daniel';
+  institution = 'Instituto Rafael Ariztía';
   institutionLocation = 'Quillota, Chile';
   avatarSrc = 'assets/avatars/profile.png';
   institutionLogo = 'assets/branding/logo.png';
