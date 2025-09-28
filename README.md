@@ -55,9 +55,21 @@
 
 ---
 
+## Arquitectura de la información
+
+<p align="center">
+  <img src="https://i.postimg.cc/GmfNkk20/image-3.png" alt="Imagen 1" width="350"/>
+  <br>
+  <img src="https://i.postimg.cc/N0rnb59q/image-4.png" alt="Imagen 2" width="350"/>
+  <br><br>
+  <a href="https://whimsical.com/GTT4RKXKGvJMUkVdoTcEVg" target="_blank">
+    <img src="https://img.shields.io/badge/Ver%20Diagramas-Click%20Aquí-blue?style=for-the-badge" alt="Ver Diagramas">
+  </a>
+</p>
+
 ## Librerias usadas con Angular
 
- ![@angular/localize](https://img.shields.io/badge/@angular%2Flocalize-EE2F2F?style=flat&logo=angular&logoColor=white) <br> Utilizado para generar una traducción al texto implementado en las vistas.
+ ![@angular/localize](https://img.shields.io/badge/@angular%2Flocalize-EE2F2F?style=flat&logo=angular&logoColor=white) v20.3.0 <br> Utilizado para generar una traducción al texto implementado en las vistas.
 
 ## Diseño de prototipos
 
