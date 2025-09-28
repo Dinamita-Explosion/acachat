@@ -40,26 +40,26 @@ import { IonicModule } from '@ionic/angular';
   `,
 })
 export class FormInputComponent implements ControlValueAccessor {
-  @Input() type: string = 'text';
+  @Input() type: HTMLInputElement['type'] = 'text';
   @Input() name?: string;
-  @Input() placeholder: string = '';
+  @Input() placeholder = '';
   @Input() icon?: string;
   @Input() autocomplete?: string;
-  @Input() required: boolean = false;
-  @Input() disabled: boolean = false;
+  @Input() required = false;
+  @Input() disabled = false;
 
-  value: string = '';
+  value = '';
 
-  private onChange: (val: any) => void = () => {};
-  onTouched: () => void = () => {};
+  private onChange: (val: string) => void = () => undefined;
+  onTouched: () => void = () => undefined;
 
-  writeValue(value: any): void {
+  writeValue(value: string | null | undefined): void {
     this.value = value ?? '';
   }
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;
   }
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
   setDisabledState(isDisabled: boolean): void {

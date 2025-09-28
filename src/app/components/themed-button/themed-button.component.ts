@@ -33,7 +33,12 @@ type ButtonVariant = 'primary' | 'secondary' | 'social';
         <ng-content></ng-content>
       </ng-container>
       <ng-template #iconOnlyTmpl>
-        <ion-icon [name]="iconName" slot="icon-only" class="text-xl"></ion-icon>
+        <ion-icon
+          *ngIf="iconName"
+          [name]="assetIconSrc ? undefined : iconName"
+          [src]="assetIconSrc"
+          slot="icon-only"
+          class="text-xl"></ion-icon>
       </ng-template>
     </ion-button>
   `,
@@ -42,19 +47,32 @@ export class ThemedButtonComponent {
   @Input() variant: ButtonVariant = 'primary';
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
   @Input() expand: 'block' | 'full' | 'default' = 'block';
-  @Input() iconOnly: boolean = false;
+  @Input() iconOnly = false;
   @Input() iconName?: string;
 
   @Output() clicked = new EventEmitter<Event>();
 
-  get borderRadius() {
-    return '0.5rem'; // rounded-lg
+  readonly borderRadius = '0.5rem'; // rounded-lg
+  readonly paddingX = '1.25rem';
+
+  get assetIconSrc(): string | undefined {
+    if (!this.iconName) {
+      return undefined;
+    }
+
+    if (this.iconName.includes('/')) {
+      return this.iconName.endsWith('.svg') ? this.iconName : `${this.iconName}.svg`;
+    }
+
+    if (this.iconName.endsWith('.svg')) {
+      return `assets/icon/${this.iconName}`;
+    }
+
+    return undefined;
   }
+
   get paddingY() {
     return this.variant === 'secondary' ? '0.625rem' : '0.75rem';
-  }
-  get paddingX() {
-    return '1.25rem';
   }
   get boxShadow() {
     return this.variant === 'primary'
@@ -98,4 +116,3 @@ export class ThemedButtonComponent {
     return this.variant === 'secondary' ? 'var(--color-brand-100)' : 'transparent';
   }
 }
-

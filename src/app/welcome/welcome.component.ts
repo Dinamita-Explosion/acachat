@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonContent } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
@@ -12,8 +12,7 @@ import { ThemedButtonComponent } from '../components/themed-button/themed-button
   imports: [CommonModule, IonContent, TextTitleComponent, ThemedButtonComponent],
 })
 export class WelcomeComponent {
-
-  constructor(private router: Router) {}
+  private readonly router = inject(Router);
 
   goToLogin() {
     this.router.navigate(['/auth/login']);

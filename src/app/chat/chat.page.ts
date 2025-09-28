@@ -1,13 +1,14 @@
 import { Component, inject } from '@angular/core';
-import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonFooter, IonIcon, IonInput } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { send, trashOutline, ellipsisHorizontal, chevronBack } from 'ionicons/icons';
-import { TopbarComponent } from '../components/topbar/topbar.component';
+import { send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline } from 'ionicons/icons';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
+import { ScreenHeaderComponent } from '../components/screen-header/screen-header.component';
+import { ActionMenuComponent, ActionMenuItem } from '../components/action-menu/action-menu.component';
 
 interface ChatMessage {
   id: number;
@@ -17,26 +18,54 @@ interface ChatMessage {
   meta?: boolean; // not sent to LLM
 }
 
+type ChatNavKey = 'title' | 'subtitle' | 'color' | 'emoji';
+
+interface GenerativePart {
+  text?: string;
+}
+
+interface GenerativeContent {
+  role: 'user' | 'model';
+  parts: GenerativePart[];
+}
+
+interface GenerationConfig {
+  temperature: number;
+  maxOutputTokens: number;
+}
+
+interface GenerateContentRequest {
+  contents: GenerativeContent[];
+  generationConfig: GenerationConfig;
+  systemInstruction?: { parts: GenerativePart[] };
+}
+
+interface GenerateContentResponse {
+  candidates?: {
+    content?: {
+      parts?: GenerativePart[];
+    };
+  }[];
+}
+
 @Component({
   selector: 'app-chat',
   templateUrl: 'chat.page.html',
   imports: [
     CommonModule,
     FormsModule,
-    TopbarComponent,
+    ScreenHeaderComponent,
+    ActionMenuComponent,
     IonButton,
     IonContent,
     IonFooter,
-    IonHeader,
     IonIcon,
     IonInput,
-    IonItem,
-    IonToolbar,
   ],
 })
 export class ChatPage {
 
-  API_KEY = 'AIzaSyCBndl8Lvpw_1N7_DMJjJ9uRDiBjjEm1dk'; /* Aqui va la apiKey de OpenAI */
+  API_KEY = ''; /* Aqui va la apiKey de OpenAI */
   MODEL = 'models/gemma-3-1b-it';
 
   messages: ChatMessage[] = [
@@ -53,26 +82,78 @@ export class ChatPage {
   private readonly nav = inject(NavController);
 
   // Header props (populated from navigation state)
-  headerTitle: string = 'Chatbot';
+  headerTitle = 'Chatbot';
   headerSubtitle?: string;
-  headerColor: string = 'var(--color-primary)';
-  headerEmoji: string = '🤖';
+  headerColor = 'var(--color-primary)';
+  headerEmoji = '🤖';
+  isOptionsOpen = false;
+  optionsEvent?: Event;
+  chatStartedAt = new Date();
+  chatStartedDisplay = this.formatChatStart(this.chatStartedAt);
+
+  readonly menuActions: ActionMenuItem[] = [
+    { id: 'download', label: 'Descargar conversación', icon: 'download-outline' },
+    { id: 'copy', label: 'Copiar conversación', icon: 'copy-outline' },
+  ];
 
   constructor() {
-    addIcons({ send, trashOutline, ellipsisHorizontal, chevronBack });
+    addIcons({ send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline });
 
-    const navState = this.router.getCurrentNavigation()?.extras?.state as any;
+    const navState = this.router.getCurrentNavigation()?.extras?.state as Record<string, unknown> | undefined;
     if (navState) {
-      this.headerTitle = navState.title || this.headerTitle;
-      this.headerSubtitle = navState.subtitle || this.headerSubtitle;
-      this.headerColor = navState.color || this.headerColor;
-      this.headerEmoji = navState.emoji || this.headerEmoji;
+      this.headerTitle = this.readNavStateValue(navState, 'title') ?? this.headerTitle;
+      this.headerSubtitle = this.readNavStateValue(navState, 'subtitle') ?? this.headerSubtitle;
+      this.headerColor = this.readNavStateValue(navState, 'color') ?? this.headerColor;
+      this.headerEmoji = this.readNavStateValue(navState, 'emoji') ?? this.headerEmoji;
     }
   }
 
-  openOptions() {
-    // Placeholder para acciones del header (configuración, limpiar, etc.)
-    console.log('Opciones del chat');
+  openOptions(event: Event) {
+    this.optionsEvent = event;
+    this.isOptionsOpen = true;
+  }
+
+  closeOptions() {
+    this.isOptionsOpen = false;
+    this.optionsEvent = undefined;
+  }
+
+  handleMenuSelection(actionId: string) {
+    switch (actionId) {
+      case 'download':
+        this.downloadChat();
+        break;
+      case 'copy':
+        this.copyChat();
+        break;
+      default:
+        this.closeOptions();
+    }
+  }
+
+  copyChat() {
+    const text = this.formatChatForExport();
+    const clipboard = navigator?.clipboard;
+    if (clipboard?.writeText) {
+      clipboard
+        .writeText(text)
+        .then(() => this.closeOptions())
+        .catch(() => this.closeOptions());
+    } else {
+      this.closeOptions();
+    }
+  }
+
+  downloadChat() {
+    const text = this.formatChatForExport();
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'chat.txt';
+    anchor.click();
+    URL.revokeObjectURL(url);
+    this.closeOptions();
   }
 
   handleBack() {
@@ -114,8 +195,8 @@ export class ChatPage {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  private buildContents() {
-    const contents: any[] = [];
+  private buildContents(): GenerativeContent[] {
+    const contents: GenerativeContent[] = [];
     let seenUser = false;
     for (const m of this.messages) {
       if (m.meta) continue; // never send meta messages
@@ -127,8 +208,8 @@ export class ChatPage {
     return contents;
   }
 
-  private buildRequestBody(opts?: { omitSystemInstruction?: boolean; prependPromptAsUser?: boolean }) {
-    const body: any = {
+  private buildRequestBody(opts?: { omitSystemInstruction?: boolean; prependPromptAsUser?: boolean }): GenerateContentRequest {
+    const body: GenerateContentRequest = {
       contents: this.buildContents(),
       generationConfig: {
         temperature: this.temperature,
@@ -150,7 +231,7 @@ export class ChatPage {
   private async generateNonStream(botId: number) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.modelId}:generateContent?key=${this.API_KEY}`;
-      let body: any = this.buildRequestBody();
+      let body = this.buildRequestBody();
       const resp = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -167,15 +248,15 @@ export class ChatPage {
             body: JSON.stringify(body),
           });
           if (!retry.ok) throw new Error(`HTTP ${retry.status}`);
-          const json: any = await retry.json();
-          const text: string = json?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('') || 'No pude generar respuesta.';
+          const json = (await retry.json()) as GenerateContentResponse;
+          const text = this.extractResponseText(json) ?? 'No pude generar respuesta.';
           this.updateBotText(botId, text);
           return;
         }
         throw new Error(`HTTP ${resp.status}`);
       }
-      const json: any = await resp.json();
-      const text: string = json?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('') || 'No pude generar respuesta.';
+      const json = (await resp.json()) as GenerateContentResponse;
+      const text = this.extractResponseText(json) ?? 'No pude generar respuesta.';
       this.updateBotText(botId, text);
     } catch (e) {
       console.error('Fallback no-stream también falló:', e);
@@ -212,5 +293,37 @@ export class ChatPage {
     // paragraphs
     html = html.split(/\n{2,}/).map(p => `<p class="mb-2">${p}</p>`).join('');
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  private formatChatForExport(): string {
+    return this.messages
+      .filter((m) => !m.meta)
+      .map((m) => `${m.from === 'user' ? 'Usuario' : 'Bot'} (${m.time}): ${m.text}`)
+      .join('\n');
+  }
+
+  private formatChatStart(date: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const day = pad(date.getDate());
+    const month = pad(date.getMonth() + 1);
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  private readNavStateValue(state: Record<string, unknown>, key: ChatNavKey): string | undefined {
+    const value = state[key];
+    return typeof value === 'string' ? value : undefined;
+  }
+
+  private extractResponseText(response: GenerateContentResponse): string | undefined {
+    const candidates = response.candidates ?? [];
+    for (const candidate of candidates) {
+      const parts = candidate.content?.parts ?? [];
+      const combined = parts.map((part) => part.text ?? '').join('');
+      if (combined.trim()) {
+        return combined;
+      }
+    }
+    return undefined;
   }
 }

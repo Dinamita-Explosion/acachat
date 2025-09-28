@@ -1,9 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TopbarComponent } from '../../components/topbar/topbar.component';
 import { CourseCardComponent } from '../../components/course-card/course-card.component';
+
+interface CourseSummary {
+  emoji: string;
+  title: string;
+  description: string;
+  professor: string;
+  period: string;
+  color: string;
+}
 
 @Component({
   selector: 'app-tab2',
@@ -14,9 +23,9 @@ export class Tab2Page {
   logoSrc = 'assets/branding/logo.png';
   avatarSrc = 'assets/avatars/profile.png';
 
-  constructor(private router: Router) {}
+  private readonly router = inject(Router);
 
-  courses = [
+  courses: CourseSummary[] = [
     {
       emoji: '🧮',
       title: 'Matemáticas I',
@@ -51,7 +60,7 @@ export class Tab2Page {
     },
   ];
 
-  onOpenCourse(course: any) {
+  onOpenCourse(course: CourseSummary) {
     // Navega a /chat pasando estado para personalizar el header
     this.router.navigate(['/chat'], {
       state: {
@@ -61,5 +70,9 @@ export class Tab2Page {
         emoji: course?.emoji || '🤖',
       },
     });
+  }
+
+  goToProfile() {
+    this.router.navigate(['/tabs/profile']);
   }
 }

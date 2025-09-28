@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -57,7 +57,7 @@ export class RegisterPage {
     ],
   };
 
-  constructor(private router: Router) {}
+  private readonly router = inject(Router);
 
   async onRegister() {
     if (!this.acceptTerms) {
