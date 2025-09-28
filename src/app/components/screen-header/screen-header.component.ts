@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonButton, IonHeader, IonIcon, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronBack, ellipsisHorizontal } from 'ionicons/icons';
+import { chevronBack, ellipsisHorizontal, settingsOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-screen-header',
@@ -77,6 +77,6 @@ export class ScreenHeaderComponent {
   @Output() action = new EventEmitter<Event>();
 
   constructor() {
-    addIcons({ chevronBack, ellipsisHorizontal });
+    addIcons({ chevronBack, ellipsisHorizontal, settingsOutline });
   }
 }
