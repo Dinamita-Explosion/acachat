@@ -55,6 +55,15 @@
 
 ---
 
+## Principios de Experiencia de Usuario (UX) y Patrones de Diseño
+
+* Arquitectura de Componentes Reutilizables
+* Navegación Intuitiva y Estándar
+* Jerarquía Visual Clara
+* Feedback Inmediato
+* Buen contraste de colores para Accesibilidad
+
+
 ## Arquitectura de la información
 
 <p align="center">
@@ -69,7 +78,7 @@
 
 ## Librerias usadas con Angular
 
- ![@angular/localize](https://img.shields.io/badge/@angular%2Flocalize-EE2F2F?style=flat&logo=angular&logoColor=white) v20.3.0 <br> Utilizado para generar una traducción al texto implementado en las vistas.
+ ![@angular/localize](https://img.shields.io/badge/@angular%2Flocalize%20v20.3.0-EE2F2F?style=flat&logo=angular&logoColor=white) <br> Utilizado para generar una traducción al texto implementado en las vistas.
 
 ## Diseño de prototipos
 
@@ -81,7 +90,7 @@
 ## Tecnologías
 <div align="center">
 
-[![Ionic](https://img.shields.io/badge/Ionic-3880FF?style=flat&logo=ionic&logoColor=white)](#)
-[![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat&logo=angular&logoColor=white)](#)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white)](#)
+![Ionic](https://img.shields.io/badge/Ionic%20v8.0+-3880FF?style=flat&logo=ionic&logoColor=white)
+[![Angular](https://img.shields.io/badge/Angular%20v15.0+-DD0031?style=flat&logo=angular&logoColor=white)](#)  
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS%20v4.0-06B6D4?style=flat&logo=tailwind-css&logoColor=white)](#)
 </div>
