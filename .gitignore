@@ -54,3 +54,12 @@ Thumbs.db
 .angular/cache
 .angular
 
+# Entorno virtual de Python
+venv/
+
+# Archivo de variables de entorno
+.env
+
+# Archivos de caché de Python
+__pycache__/
+*.pyc
