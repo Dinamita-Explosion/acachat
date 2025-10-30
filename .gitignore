@@ -19,6 +19,7 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
+.claude
 
 # Visual Studio Code
 .vscode/*
@@ -54,12 +55,48 @@ Thumbs.db
 .angular/cache
 .angular
 
+# ==================================
+# Python / Flask Backend
+# ==================================
+
 # Entorno virtual de Python
 venv/
+env/
+ENV/
+*.venv
 
-# Archivo de variables de entorno
+# Archivo de variables de entorno (¡IMPORTANTE! Contiene credenciales)
 .env
+.env.local
+.env.*.local
 
 # Archivos de caché de Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+.zed
+
+# Bases de datos locales
+*.db
+*.sqlite
+*.sqlite3
+
+# Archivos subidos por usuarios (¡IMPORTANTE!)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json

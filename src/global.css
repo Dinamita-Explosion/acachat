@@ -30,6 +30,9 @@
 
 :root {
   color-scheme: light;
+  --app-primary-contrast: #ffffff;
+  --app-primary-muted: #ccc8ff;
+  --app-primary-muted-contrast: #110f49;
 }
 
 /*

@@ -14,6 +14,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'social';
       [expand]="expand"
       mode="ios"
       class="font-semibold"
+      [disabled]="disabled"
       [style.--background]="background"
       [style.--background-hover]="backgroundHover"
       [style.--background-activated]="backgroundHover"
@@ -49,6 +50,7 @@ export class ThemedButtonComponent {
   @Input() expand: 'block' | 'full' | 'default' = 'block';
   @Input() iconOnly = false;
   @Input() iconName?: string;
+  @Input() disabled = false;
 
   @Output() clicked = new EventEmitter<Event>();
 

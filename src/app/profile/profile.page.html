@@ -1,62 +1,85 @@
-<app-screen-header
-  [showTitleBlock]="false"
-  [showActionButton]="true"
-  [actionIcon]="'settings-outline'"
-  [actionAriaLabel]="'Abrir configuración'"
-  (back)="goBack()"
-  (action)="onSettings()"
-></app-screen-header>
+<ng-container *ngIf="viewModel$ | async as vm">
+  <app-screen-header
+    [showTitleBlock]="false"
+    [showActionButton]="true"
+    [actionIcon]="'settings-outline'"
+    [actionAriaLabel]="'Editar nombre de usuario'"
+    (back)="goBack()"
+    (action)="onSettings()"
+  ></app-screen-header>
 
-<ion-content [fullscreen]="false" class="bg-white">
-  <div class="space-y-6 px-4 py-6">
-    <div class="flex flex-col items-center gap-3">
-      <div class="h-28 w-28 overflow-hidden rounded-full border-4 border-brand-100 shadow-lg">
-        <img
-          [src]="avatarSrc"
-          [alt]="'Foto de ' + name"
-          class="h-full w-full object-cover"
-        />
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-3">
-      <div class="flex h-32 flex-col justify-between rounded-2xl bg-neutral-800 p-4 text-white shadow-md">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wide text-white/70">Nombre</span>
-          <ion-icon name="person-circle-outline" class="text-xl text-brand-50"></ion-icon>
-        </div>
-        <div>
-          <p class="text-lg font-bold">{{ name }}</p>
-        </div>
-      </div>
-
-      <div class="flex h-32 flex-col justify-between rounded-2xl bg-neutral-800 p-4 text-white shadow-md">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wide text-white/70">Curso</span>
-          <ion-icon name="school-outline" class="text-xl text-brand-50"></ion-icon>
-        </div>
-        <div>
-          <p class="text-lg font-bold">{{ course }}</p>
-          <p class="text-xs text-white/70">{{ courseDescription }}</p>
-        </div>
-      </div>
-
-      <div class="flex h-32 flex-col justify-between rounded-2xl bg-neutral-800 p-4 text-white shadow-md mb-10">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wide text-white/70">Institución</span>
-          <div class="h-10 w-10 overflow-hidden rounded-full border border-white/30 bg-white/90">
-            <img
-              [src]="institutionLogo"
-              alt="Logo de la institución"
-              class="h-full w-full object-cover"
-            />
+  <ion-content [fullscreen]="false" class="bg-white">
+    <div class="space-y-6 px-4 py-6">
+      <div class="flex flex-col items-center gap-3">
+        <div
+          class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 shadow-lg"
+          [style.borderColor]="vm.palette.primary"
+        >
+          <div
+            class="flex h-full w-full items-center justify-center text-3xl font-semibold text-white"
+            [style.background]="vm.palette.primary"
+          >
+            {{ vm.initials }}
           </div>
         </div>
-        <div>
-          <p class="text-lg font-bold">{{ institution }}</p>
-          <p class="text-xs text-white/70">{{ institutionLocation }}</p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3">
+        <div
+          class="flex h-32 flex-col justify-between rounded-2xl p-4 text-white shadow-md"
+          [style.background]="vm.palette.primary"
+          [style.color]="vm.palette.contrast"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wide" style="opacity: 0.7">Nombre</span>
+            <ion-icon name="person-circle-outline" class="text-xl" [style.color]="vm.palette.contrast"></ion-icon>
+          </div>
+          <div>
+            <p class="text-lg font-bold">{{ vm.user?.username }}</p>
+            <p class="text-xs" style="opacity: 0.75">{{ vm.user?.email }}</p>
+          </div>
+        </div>
+
+        <div
+          class="flex h-32 flex-col justify-between rounded-2xl p-4 text-white shadow-md"
+          [style.background]="vm.palette.muted"
+          [style.color]="vm.palette.mutedContrast"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wide" style="opacity: 0.7">Curso</span>
+            <ion-icon name="school-outline" class="text-xl" [style.color]="vm.palette.primary"></ion-icon>
+          </div>
+          <div>
+            <p class="text-lg font-bold">{{ vm.gradeName }}</p>
+            <p class="text-xs" style="opacity: 0.7">{{ vm.user?.role | titlecase }} · {{ vm.user?.rut || 'RUT no informado' }}</p>
+          </div>
+        </div>
+
+        <div class="mb-10 flex h-32 flex-col justify-between rounded-2xl bg-neutral-800 p-4 text-white shadow-md">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wide text-white/70">Institución</span>
+            <div
+              class="h-10 w-10 overflow-hidden rounded-full border border-white/30 bg-white/90"
+              *ngIf="vm.institutionLogo; else institutionFallback"
+            >
+              <img [src]="vm.institutionLogo" alt="Logo de la institución" class="h-full w-full object-contain" loading="lazy" decoding="async" />
+            </div>
+            <ng-template #institutionFallback>
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-sm font-semibold">
+                {{ vm.initials }}
+              </div>
+            </ng-template>
+          </div>
+          <div>
+            <p class="text-lg font-bold">{{ vm.institutionName }}</p>
+            <p class="text-xs text-white/70">{{ vm.location }}</p>
+          </div>
         </div>
       </div>
+
+      <div class="mb-10 rounded-3xl border border-dashed border-brand-200 bg-brand-50/70 px-5 py-4 text-xs text-brand-700">
+        Solo puedes actualizar tu nombre desde este espacio. Para cambios de correo, grado u otros datos, contacta a un administrador.
+      </div>
     </div>
-  </div>
-</ion-content>
+  </ion-content>
+</ng-container>

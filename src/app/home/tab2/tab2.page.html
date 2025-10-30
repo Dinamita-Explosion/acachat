@@ -1,20 +1,48 @@
 <ion-content [fullscreen]="true" class="bg-white">
-  <app-topbar
-    [logoSrc]="logoSrc"
-    [avatarSrc]="avatarSrc"
-    (avatarClicked)="goToProfile()"
-  ></app-topbar>
+  <ng-container *ngIf="viewModel$ | async as vm">
+    <app-topbar
+      [logoSrc]="vm.institutionLogo"
+      [avatarSrc]="null"
+      [userInitials]="vm.initials"
+      (avatarClicked)="goToProfile()"
+    ></app-topbar>
 
-  <div class="px-4 py-3 space-y-4">
-    <app-course-card
-      *ngFor="let c of courses"
-      [emoji]="c.emoji"
-      [title]="c.title"
-      [description]="c.description"
-      [professor]="c.professor"
-      [period]="c.period"
-      [color]="c.color"
-      (pressed)="onOpenCourse(c)"
-    ></app-course-card>
-  </div>
+    <div class="px-4 py-3 space-y-4">
+      <ng-container *ngIf="vm.courses.length; else emptyState">
+        <ng-container *ngFor="let course of vm.courses">
+          <app-course-card
+            [emoji]="course.badge"
+            [title]="course.title"
+            [description]="course.description"
+            [professor]="course.subtitle"
+            [period]="course.period"
+            [color]="course.color"
+            [thumbnailSrc]="course.logo"
+            (pressed)="onOpenCourse(course)"
+          ></app-course-card>
+
+          <div *ngIf="course.canUpload" class="flex items-center justify-end gap-3 pb-4">
+            <input type="file" #fileInput hidden (change)="onFileSelected($event, course)" />
+            <ion-button
+              mode="ios"
+              size="small"
+              fill="outline"
+              class="normal-case"
+              [disabled]="uploadingCourseId === course.id"
+              (click)="onUploadClick(fileInput)"
+            >
+              <ion-icon slot="start" name="cloud-upload"></ion-icon>
+              {{ uploadingCourseId === course.id ? 'Subiendo...' : 'Agregar archivos' }}
+            </ion-button>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <ng-template #emptyState>
+        <div class="rounded-2xl border border-dashed border-brand-100 bg-white p-6 text-center text-sm text-brand-700">
+          Aún no tienes cursos asignados. Cuando un administrador te matricule en un curso, aparecerá aquí.
+        </div>
+      </ng-template>
+    </div>
+  </ng-container>
 </ion-content>

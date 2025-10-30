@@ -94,3 +94,12 @@
 [![Angular](https://img.shields.io/badge/Angular%20v15.0+-DD0031?style=flat&logo=angular&logoColor=white)](#)  
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS%20v4.0-06B6D4?style=flat&logo=tailwind-css&logoColor=white)](#)
 </div>
+
+## Backend
+
+- Ubícate en `backend/` y activa el entorno virtual: `python3 -m venv venv && source venv/bin/activate`.
+- Instala dependencias: `pip install -r requirements.txt`.
+- Copia `.env.example` a `.env` y completa tus credenciales; la app crea la base de datos si no existe.
+- Ejecuta migraciones: `FLASK_APP=app:create_app flask db upgrade`.
+- (Opcional) Poblado rápido: `FLASK_APP=app:create_app flask seed-db`.
+- Arranca el backend: `python run.py` (usa `BACKEND_PORT` / `BACKEND_HOST` para personalizar).

@@ -40,6 +40,14 @@
             [required]="true"
             [(ngModel)]="email"></app-form-input>
 
+          <app-form-select
+            name="institution"
+            placeholder="Institución Educativa"
+            icon="school-outline"
+            [required]="true"
+            [options]="institutions"
+            [(ngModel)]="institutionId"></app-form-select>
+
           <div class="grid grid-cols-2 gap-3">
             <app-form-select
               name="region"
@@ -92,13 +100,24 @@
         </div>
 
         <div class="space-y-4 pt-1">
-          <app-themed-button type="submit" variant="primary">Crear cuenta</app-themed-button>
+          <app-themed-button type="submit" variant="primary" [disabled]="isLoading">
+            <ng-container *ngIf="!isLoading; else loadingTpl">Crear cuenta</ng-container>
+          </app-themed-button>
           <div class="border-t border-brand-100 pt-4">
             <app-themed-button type="button" variant="secondary" (clicked)="goToLogin()">
               ¿Ya tienes una cuenta? Inicia sesión
             </app-themed-button>
           </div>
         </div>
+
+        <p *ngIf="errorMessage" class="text-center text-sm text-red-500">{{ errorMessage }}</p>
+
+        <ng-template #loadingTpl>
+          <span class="flex items-center justify-center gap-2">
+            <ion-spinner name="crescent"></ion-spinner>
+            Procesando...
+          </span>
+        </ng-template>
       </form>
     </div>
   </div>

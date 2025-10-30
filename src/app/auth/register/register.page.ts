@@ -1,16 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
 import { FormInputComponent } from '../../components/form-input/form-input.component';
 import { FormSelectComponent, SelectOption } from '../../components/form-select/form-select.component';
 import { LegalModalComponent } from '../../components/legal-modal/legal-modal.component';
 import { TextTitleComponent } from '../../components/text-title/text-title.component';
 import { ThemedButtonComponent } from '../../components/themed-button/themed-button.component';
+import { finalize } from 'rxjs/operators';
+import { AuthService } from '../../core/services/auth.service';
+import { RegisterRequest } from '../../core/models/auth.models';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -28,7 +30,7 @@ import { ThemedButtonComponent } from '../../components/themed-button/themed-but
     LegalModalComponent,
   ],
 })
-export class RegisterPage {
+export class RegisterPage implements OnInit {
   username = '';
   rut = '';
   email = '';
@@ -36,8 +38,14 @@ export class RegisterPage {
   comuna = '';
   password = '';
   confirmPassword = '';
+  institutionId: string | null = null;
 
   acceptTerms = false;
+  isLoading = false;
+  isLoadingInstitutions = false;
+  errorMessage = '';
+
+  institutions: SelectOption<string>[] = [];
 
   regions: SelectOption<string>[] = [
     { label: 'Región Metropolitana', value: 'RM' },
@@ -62,18 +70,43 @@ export class RegisterPage {
   };
 
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
   private readonly http = inject(HttpClient);
-  private readonly API_URL = 'http://127.0.0.1:5000'; // URL de tu backend Flask
+
+  ngOnInit() {
+    this.loadInstitutions();
+  }
+
+  loadInstitutions() {
+    this.isLoadingInstitutions = true;
+    this.http
+      .get<{ institutions: any[] }>(`${environment.apiBaseUrl}/institutions?per_page=100`)
+      .pipe(finalize(() => (this.isLoadingInstitutions = false)))
+      .subscribe({
+        next: (response) => {
+          this.institutions = response.institutions.map((inst) => ({
+            label: inst.nombre,
+            value: String(inst.id),
+          }));
+        },
+        error: (error) => {
+          console.error('Error loading institutions', error);
+          this.errorMessage = 'Error al cargar las instituciones. Intenta de nuevo.';
+        },
+      });
+  }
 
   onRegister() {
     if (!this.acceptTerms) {
-      console.warn('Debe aceptar términos y condiciones.');
-      // Aquí podrías mostrar una alerta al usuario
+      this.errorMessage = 'Debes aceptar los términos y condiciones para continuar.';
       return;
     }
     if (this.password !== this.confirmPassword) {
-      console.warn('Las contraseñas no coinciden');
-      // Aquí podrías mostrar una alerta al usuario
+      this.errorMessage = 'Las contraseñas no coinciden';
+      return;
+    }
+    if (!this.institutionId) {
+      this.errorMessage = 'Debes seleccionar una institución';
       return;
     }
 
@@ -84,23 +117,26 @@ export class RegisterPage {
       region: this.region,
       comuna: this.comuna,
       password: this.password,
-    };
+      institution_id: Number(this.institutionId),
+      role: 'student',
+    } satisfies RegisterRequest;
 
-    this.http
-      .post(`${this.API_URL}/api/register`, registerData)
-      .pipe(
-        tap((response) => {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.auth
+      .register(registerData)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: (response) => {
           console.log('Registro exitoso', response);
-          // Opcional: Muestra un mensaje de éxito
-          this.router.navigate(['/auth/login']); // Redirige a login después del registro
-        }),
-        catchError((error) => {
+          this.router.navigate(['/auth/login']);
+        },
+        error: (error) => {
+          this.errorMessage = extractErrorMessage(error) || 'Error al registrar usuario';
           console.error('Error en el registro', error);
-          // Opcional: Muestra un mensaje de error al usuario
-          return of(error); // Continúa el flujo de manera controlada
-        }),
-      )
-      .subscribe();
+        },
+      });
   }
 
   goToLogin() {
@@ -113,4 +149,46 @@ export class RegisterPage {
 
   isTermsOpen = false;
   isPrivacyOpen = false;
+}
+
+function extractErrorMessage(error: unknown): string | null {
+  if (!error) return null;
+  const err: any = error;
+  const raw = err?.error?.msg ?? err?.message ?? err?.statusText;
+  if (!raw) return null;
+  if (typeof raw === 'string') {
+    return normalizeErrorString(raw);
+  }
+  if (Array.isArray(raw)) {
+    return raw.map(item => (typeof item === 'string' ? item : JSON.stringify(item))).join(' ');
+  }
+  if (typeof raw === 'object') {
+    return Object.values(raw)
+      .flat()
+      .map((item) => (typeof item === 'string' ? item : JSON.stringify(item)))
+      .join(' ');
+  }
+  return null;
+}
+
+function normalizeErrorString(message: string): string {
+  const trimmed = message.trim();
+  if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+    return trimmed;
+  }
+  try {
+    const parsed = JSON.parse(
+      trimmed
+        .replace(/'/g, '"')
+        .replace(/None/g, 'null')
+        .replace(/True/g, 'true')
+        .replace(/False/g, 'false'),
+    );
+    return Object.values(parsed)
+      .flat()
+      .map((item: unknown) => (typeof item === 'string' ? item : JSON.stringify(item)))
+      .join(' ');
+  } catch {
+    return trimmed;
+  }
 }
