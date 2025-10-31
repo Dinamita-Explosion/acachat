@@ -100,21 +100,39 @@ def build_system_prompt(course: Course) -> str:
     """
     base_prompt = course.prompt or "Eres un asistente educativo útil que responde preguntas sobre el curso."
 
+    # Información del curso que siempre debe incluirse
+    institution_name = course.institution.nombre if course.institution else "Institución no registrada"
+    grade_name = course.grade.name if course.grade else "Grado no asignado"
+    teachers = course.get_teachers()
+    if teachers:
+        teacher_names = ", ".join(sorted({teacher.username for teacher in teachers if teacher and teacher.username}))
+    else:
+        teacher_names = "Aún no hay profesores asignados al curso"
+
+    course_overview = f"""# INFORMACIÓN DEL CURSO
+- Nombre del curso: {course.nombre}
+- Grado: {grade_name}
+- Institución: {institution_name}
+- Docentes responsables: {teacher_names}
+"""
+
     context = build_course_context(course.id)
 
-    full_prompt = f"""{base_prompt}
+    full_prompt = f"""{course_overview}
+# INSTRUCCIONES PRINCIPALES
+{base_prompt.strip()}
 
 # CONTEXTO DEL CURSO
 Tienes acceso a los siguientes materiales del curso para responder preguntas:
 
 {context}
 
-# INSTRUCCIONES
-- Usa el contexto proporcionado para responder preguntas de manera precisa
-- Si la respuesta está en los archivos, cita el nombre del archivo
-- Si no tienes la información, sé honesto y dilo
-- Responde en español de manera clara y educativa
-- Si te preguntan sobre algo que no está en el contexto, usa tu conocimiento general pero aclara que no está en los materiales del curso
+# PAUTAS DE RESPUESTA
+- Usa el contexto proporcionado para responder preguntas de manera precisa.
+- Si la respuesta está en los archivos, cita el nombre del archivo.
+- Si no tienes la información, sé honesto e indícalo.
+- Responde en español con un tono educativo y cercano a la institución.
+- Si te preguntan sobre algo que no está en el contexto, puedes usar conocimiento general pero aclara que no proviene de los materiales del curso.
 """
 
     return full_prompt
@@ -172,6 +190,15 @@ def chat_with_course(course_id):
 
         # Construir el prompt del sistema
         system_prompt = build_system_prompt(course)
+
+        # Log de auditoría del prompt y mensajes
+        current_app.logger.debug(
+            "Prompt Gemini generado para curso %s (%s) por %s:\n%s",
+            course.id,
+            course.nombre,
+            user.email,
+            system_prompt,
+        )
 
         # Configurar el modelo
         model_name = current_app.config.get('GEMINI_MODEL', 'gemini-1.5-flash')

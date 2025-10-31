@@ -21,20 +21,6 @@
             (pressed)="onOpenCourse(course)"
           ></app-course-card>
 
-          <div *ngIf="course.canUpload" class="flex items-center justify-end gap-3 pb-4">
-            <input type="file" #fileInput hidden (change)="onFileSelected($event, course)" />
-            <ion-button
-              mode="ios"
-              size="small"
-              fill="outline"
-              class="normal-case"
-              [disabled]="uploadingCourseId === course.id"
-              (click)="onUploadClick(fileInput)"
-            >
-              <ion-icon slot="start" name="cloud-upload"></ion-icon>
-              {{ uploadingCourseId === course.id ? 'Subiendo...' : 'Agregar archivos' }}
-            </ion-button>
-          </div>
         </ng-container>
       </ng-container>
 

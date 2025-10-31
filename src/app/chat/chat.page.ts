@@ -1,14 +1,18 @@
 import { Component, inject } from '@angular/core';
-import { IonButton, IonContent, IonFooter, IonIcon, IonInput } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonFooter, IonIcon, IonInput, IonModal } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline } from 'ionicons/icons';
+import { send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline, settingsOutline, cloudUpload, saveOutline } from 'ionicons/icons';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { ScreenHeaderComponent } from '../components/screen-header/screen-header.component';
 import { ActionMenuComponent, ActionMenuItem } from '../components/action-menu/action-menu.component';
+import { ScreenHeaderComponent } from '../components/screen-header/screen-header.component';
+import { ChatService, CourseChatMessage } from '../core/services/chat.service';
+import { CoursesService, CourseFileDto } from '../core/services/courses.service';
+import { AuthService } from '../core/services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 interface ChatMessage {
   id: number;
@@ -19,34 +23,6 @@ interface ChatMessage {
 }
 
 type ChatNavKey = 'title' | 'subtitle' | 'color' | 'emoji';
-
-interface GenerativePart {
-  text?: string;
-}
-
-interface GenerativeContent {
-  role: 'user' | 'model';
-  parts: GenerativePart[];
-}
-
-interface GenerationConfig {
-  temperature: number;
-  maxOutputTokens: number;
-}
-
-interface GenerateContentRequest {
-  contents: GenerativeContent[];
-  generationConfig: GenerationConfig;
-  systemInstruction?: { parts: GenerativePart[] };
-}
-
-interface GenerateContentResponse {
-  candidates?: {
-    content?: {
-      parts?: GenerativePart[];
-    };
-  }[];
-}
 
 @Component({
   selector: 'app-chat',
@@ -61,12 +37,10 @@ interface GenerateContentResponse {
     IonFooter,
     IonIcon,
     IonInput,
+    IonModal,
   ],
 })
 export class ChatPage {
-
-  API_KEY = ''; /* Aqui va la apiKey de OpenAI */
-  MODEL = 'models/gemma-3-1b-it';
 
   messages: ChatMessage[] = [
     { id: 1, from: 'bot', text: 'Nueva conversación iniciada. ¿En qué te ayudo?', time: this.now(), meta: true },
@@ -74,12 +48,14 @@ export class ChatPage {
 
   draft = '';
   isSending = false;
-  systemPrompt = 'Eres un asistente útil y conciso que responde en español con un tono institucional cercano.';
   temperature = 0.6;
   maxOutputTokens = 2048;
   private readonly sanitizer = inject(DomSanitizer);
   private readonly router = inject(Router);
   private readonly nav = inject(NavController);
+  private readonly chatService = inject(ChatService);
+  private readonly auth = inject(AuthService);
+  private readonly coursesService = inject(CoursesService);
 
   // Header props (populated from navigation state)
   headerTitle = 'Chatbot';
@@ -90,22 +66,48 @@ export class ChatPage {
   optionsEvent?: Event;
   chatStartedAt = new Date();
   chatStartedDisplay = this.formatChatStart(this.chatStartedAt);
+  courseId: number | null = null;
+  canManageCourse = false;
 
-  readonly menuActions: ActionMenuItem[] = [
-    { id: 'download', label: 'Descargar conversación', icon: 'download-outline' },
-    { id: 'copy', label: 'Copiar conversación', icon: 'copy-outline' },
-  ];
+  menuActions: ActionMenuItem[] = [];
+
+  // Configuración del curso
+  isConfigOpen = false;
+  isConfigLoading = false;
+  configError: string | null = null;
+  promptDraft = '';
+  originalPrompt = '';
+  isSavingPrompt = false;
+  promptSaveMessage: string | null = null;
+  filesMessage: string | null = null;
+  files: CourseFileDto[] = [];
+  isFilesLoading = false;
+  isUploadingFile = false;
+  uploadError: string | null = null;
+  isDeletingFileId: number | null = null;
+  courseConfigName: string | null = null;
 
   constructor() {
-    addIcons({ send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline });
+    addIcons({ send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline, settingsOutline, cloudUpload, saveOutline });
 
-    const navState = this.router.getCurrentNavigation()?.extras?.state as Record<string, unknown> | undefined;
-    if (navState) {
-      this.headerTitle = this.readNavStateValue(navState, 'title') ?? this.headerTitle;
-      this.headerSubtitle = this.readNavStateValue(navState, 'subtitle') ?? this.headerSubtitle;
-      this.headerColor = this.readNavStateValue(navState, 'color') ?? this.headerColor;
-      this.headerEmoji = this.readNavStateValue(navState, 'emoji') ?? this.headerEmoji;
+    const state = (this.router.getCurrentNavigation()?.extras?.state ??
+      window.history.state) as Record<string, unknown> | undefined;
+
+    if (state) {
+      this.headerTitle = this.readNavStateValue(state, 'title') ?? this.headerTitle;
+      this.headerSubtitle = this.readNavStateValue(state, 'subtitle') ?? this.headerSubtitle;
+      this.headerColor = this.readNavStateValue(state, 'color') ?? this.headerColor;
+      this.headerEmoji = this.readNavStateValue(state, 'emoji') ?? this.headerEmoji;
+      this.courseId = this.readNavStateNumber(state, 'courseId');
+      this.canManageCourse = Boolean(state['canManage']);
     }
+
+    const currentUser = this.auth.getCurrentUser();
+    if (!this.canManageCourse && currentUser?.role === 'admin') {
+      this.canManageCourse = true;
+    }
+
+    this.buildMenuActions();
   }
 
   openOptions(event: Event) {
@@ -125,6 +127,9 @@ export class ChatPage {
         break;
       case 'copy':
         this.copyChat();
+        break;
+      case 'configure':
+        this.openConfiguration();
         break;
       default:
         this.closeOptions();
@@ -156,6 +161,165 @@ export class ChatPage {
     this.closeOptions();
   }
 
+  private buildMenuActions() {
+    const actions: ActionMenuItem[] = [
+      { id: 'download', label: 'Descargar conversación', icon: 'download-outline' },
+      { id: 'copy', label: 'Copiar conversación', icon: 'copy-outline' },
+    ];
+    if (this.canManageCourse) {
+      actions.push({ id: 'configure', label: 'Configurar curso', icon: 'settings-outline' });
+    }
+    this.menuActions = actions;
+  }
+
+  openConfiguration() {
+    if (!this.canManageCourse) {
+      this.closeOptions();
+      return;
+    }
+    this.closeOptions();
+    this.isConfigOpen = true;
+    this.filesMessage = null;
+    this.promptSaveMessage = null;
+    void this.loadCourseConfiguration();
+  }
+
+  closeConfiguration() {
+    this.isConfigOpen = false;
+  }
+
+  private async loadCourseConfiguration(): Promise<void> {
+    if (!this.courseId) {
+      this.configError = 'No se pudo determinar el curso.';
+      this.isConfigLoading = false;
+      return;
+    }
+
+    this.isConfigLoading = true;
+    this.isFilesLoading = true;
+    this.configError = null;
+
+    try {
+      const [course, filesResponse] = await Promise.all([
+        firstValueFrom(this.coursesService.getCourseById(this.courseId)),
+        firstValueFrom(this.coursesService.listCourseFiles(this.courseId)),
+      ]);
+
+      this.courseConfigName = course.nombre;
+      this.promptDraft = course.prompt ?? '';
+      this.originalPrompt = this.promptDraft;
+      this.files = filesResponse.files ?? [];
+    } catch (error) {
+      console.error('Error al cargar configuración del curso', error);
+      this.configError = this.resolveErrorMessage(error, 'No se pudo cargar la configuración del curso.');
+    } finally {
+      this.isConfigLoading = false;
+      this.isFilesLoading = false;
+    }
+  }
+
+  savePrompt() {
+    if (!this.courseId || this.isSavingPrompt) {
+      return;
+    }
+
+    const payloadPrompt = this.promptDraft?.trim() ? this.promptDraft.trim() : null;
+
+    if (payloadPrompt === (this.originalPrompt?.trim() || null)) {
+      this.promptSaveMessage = 'No hay cambios para guardar.';
+      return;
+    }
+
+    this.isSavingPrompt = true;
+    this.promptSaveMessage = null;
+    this.configError = null;
+
+    this.coursesService.updateCourse(this.courseId, { prompt: payloadPrompt }).subscribe({
+      next: (course) => {
+        this.originalPrompt = course.prompt ?? '';
+        this.promptDraft = course.prompt ?? '';
+        this.promptSaveMessage = 'Prompt actualizado correctamente.';
+        this.isSavingPrompt = false;
+      },
+      error: (error) => {
+        console.error('Error al actualizar prompt', error);
+        this.configError = this.resolveErrorMessage(error, 'No se pudo actualizar el prompt.');
+        this.isSavingPrompt = false;
+      },
+    });
+  }
+
+  onConfigFileSelected(event: Event) {
+    if (!this.courseId || this.isUploadingFile) {
+      return;
+    }
+
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    this.isUploadingFile = true;
+    this.uploadError = null;
+    this.filesMessage = null;
+
+    this.coursesService.uploadCourseFile(this.courseId, file).subscribe({
+      next: async () => {
+        this.isUploadingFile = false;
+        this.filesMessage = 'Archivo subido correctamente.';
+        input.value = '';
+        await this.refreshFiles();
+      },
+      error: async (error) => {
+        console.error('Error al subir archivo', error);
+        this.uploadError = this.resolveErrorMessage(error, 'No se pudo subir el archivo.');
+        this.isUploadingFile = false;
+        input.value = '';
+        await this.refreshFiles();
+      },
+    });
+  }
+
+  deleteFile(fileId: number) {
+    if (this.isDeletingFileId !== null) {
+      return;
+    }
+
+    this.isDeletingFileId = fileId;
+    this.uploadError = null;
+    this.filesMessage = null;
+
+    this.coursesService.deleteCourseFile(fileId).subscribe({
+      next: async () => {
+        this.isDeletingFileId = null;
+        this.filesMessage = 'Archivo eliminado correctamente.';
+        await this.refreshFiles();
+      },
+      error: (error) => {
+        console.error('Error al eliminar archivo', error);
+        this.uploadError = this.resolveErrorMessage(error, 'No se pudo eliminar el archivo.');
+        this.isDeletingFileId = null;
+      },
+    });
+  }
+
+  private async refreshFiles() {
+    if (!this.courseId) {
+      return;
+    }
+    this.isFilesLoading = true;
+    try {
+      const response = await firstValueFrom(this.coursesService.listCourseFiles(this.courseId));
+      this.files = response.files ?? [];
+    } catch (error) {
+      console.error('Error al refrescar archivos', error);
+      this.uploadError = this.resolveErrorMessage(error, 'No se pudo actualizar la lista de archivos.');
+    } finally {
+      this.isFilesLoading = false;
+    }
+  }
+
   handleBack() {
     try {
       // Si hay historial, vuelve. Si no, navega a Tab2 por defecto
@@ -170,6 +334,7 @@ export class ChatPage {
   }
 
   sendMessage() {
+    if (this.isSending) return;
     const text = this.draft?.trim();
     if (!text) return;
     this.messages = [
@@ -182,7 +347,7 @@ export class ChatPage {
       ...this.messages,
       { id: botId, from: 'bot', text: '', time: this.now() },
     ];
-    this.generateNonStream(botId);
+    this.sendCourseChatRequest(botId);
   }
 
   clearChat() {
@@ -195,78 +360,56 @@ export class ChatPage {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  private buildContents(): GenerativeContent[] {
-    const contents: GenerativeContent[] = [];
+  private sendCourseChatRequest(botId: number) {
+    if (!this.courseId) {
+      console.error('No se pudo determinar el curso para el chat.');
+      this.updateBotText(botId, '\n\n[Error] No se logró identificar el curso. Vuelve a abrirlo desde la lista.');
+      return;
+    }
+
+    const payloadMessages = this.buildBackendMessages();
+    if (payloadMessages.length === 0) {
+      this.updateBotText(botId, 'No tengo mensajes para procesar.');
+      return;
+    }
+
+    this.isSending = true;
+    this.chatService
+      .sendCourseMessage(this.courseId, {
+        messages: payloadMessages,
+        temperature: this.temperature,
+        max_tokens: this.maxOutputTokens,
+      })
+      .subscribe({
+        next: (response) => {
+          const text = response.response?.trim() || 'No pude generar respuesta.';
+          this.updateBotText(botId, text);
+          if ((!this.headerTitle || this.headerTitle === 'Chatbot') && response.course?.nombre) {
+            this.headerTitle = response.course.nombre;
+          }
+          this.isSending = false;
+        },
+        error: (error) => {
+          console.error('Error al hablar con el chatbot del curso', error);
+          this.updateBotText(botId, '\n\n[Error] No se pudo completar la respuesta. Intenta nuevamente en unos segundos.');
+          this.isSending = false;
+        },
+      });
+  }
+
+  private buildBackendMessages(): CourseChatMessage[] {
+    const contents: CourseChatMessage[] = [];
     let seenUser = false;
     for (const m of this.messages) {
       if (m.meta) continue; // never send meta messages
       if (m.from === 'user') seenUser = true;
       if (!seenUser) continue; // skip any bot text before first user
       if (m.from === 'bot' && !m.text) continue;
-      contents.push({ role: m.from === 'user' ? 'user' : 'model', parts: [{ text: m.text }] });
+      contents.push({ role: m.from === 'user' ? 'user' : 'model', content: m.text });
     }
     return contents;
   }
 
-  private buildRequestBody(opts?: { omitSystemInstruction?: boolean; prependPromptAsUser?: boolean }): GenerateContentRequest {
-    const body: GenerateContentRequest = {
-      contents: this.buildContents(),
-      generationConfig: {
-        temperature: this.temperature,
-        maxOutputTokens: this.maxOutputTokens,
-      },
-    };
-    const prompt = this.systemPrompt?.trim();
-    if (prompt && !opts?.omitSystemInstruction) {
-      body.systemInstruction = { parts: [{ text: prompt }] };
-    } else if (prompt && opts?.prependPromptAsUser) {
-      body.contents = [
-        { role: 'user', parts: [{ text: `INSTRUCCIONES: ${prompt}` }] },
-        ...body.contents,
-      ];
-    }
-    return body;
-  }
-
-  private async generateNonStream(botId: number) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.modelId}:generateContent?key=${this.API_KEY}`;
-      let body = this.buildRequestBody();
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!resp.ok) {
-        const errText = await resp.text().catch(() => '');
-        console.error('Non-stream HTTP error', resp.status, errText);
-        if (errText.includes('Developer instruction is not enabled')) {
-          body = this.buildRequestBody({ omitSystemInstruction: true, prependPromptAsUser: true });
-          const retry = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-          });
-          if (!retry.ok) throw new Error(`HTTP ${retry.status}`);
-          const json = (await retry.json()) as GenerateContentResponse;
-          const text = this.extractResponseText(json) ?? 'No pude generar respuesta.';
-          this.updateBotText(botId, text);
-          return;
-        }
-        throw new Error(`HTTP ${resp.status}`);
-      }
-      const json = (await resp.json()) as GenerateContentResponse;
-      const text = this.extractResponseText(json) ?? 'No pude generar respuesta.';
-      this.updateBotText(botId, text);
-    } catch (e) {
-      console.error('Fallback no-stream también falló:', e);
-      this.updateBotText(botId, '\n\n[Error] No se pudo completar la respuesta. Verifica API key/modelo o CORS.');
-    }
-  }
-
-  private get modelId(): string {
-    return (this.MODEL || '').replace(/^models\//, '');
-  }
   private updateBotText(id: number, piece: string, append = false) {
     this.messages = this.messages.map((m) =>
       m.id === id ? { ...m, text: append ? (m.text + piece) : piece } : m
@@ -310,20 +453,53 @@ export class ChatPage {
     return `${day}/${month}/${year}`;
   }
 
+  private resolveErrorMessage(error: unknown, fallback: string): string {
+    if (!error) {
+      return fallback;
+    }
+
+    if (typeof error === 'string') {
+      return error;
+    }
+
+    if (error instanceof Error) {
+      return error.message || fallback;
+    }
+
+    if (typeof error === 'object') {
+      const maybe = error as { message?: string; error?: unknown };
+      if (typeof maybe?.message === 'string' && maybe.message.trim()) {
+        return maybe.message;
+      }
+      if (maybe?.error) {
+        const nested = maybe.error as { msg?: string } | string;
+        if (typeof nested === 'string' && nested.trim()) {
+          return nested;
+        }
+        if (typeof nested === 'object' && nested && typeof nested.msg === 'string' && nested.msg.trim()) {
+          return nested.msg;
+        }
+      }
+    }
+
+    return fallback;
+  }
+
   private readNavStateValue(state: Record<string, unknown>, key: ChatNavKey): string | undefined {
     const value = state[key];
     return typeof value === 'string' ? value : undefined;
   }
 
-  private extractResponseText(response: GenerateContentResponse): string | undefined {
-    const candidates = response.candidates ?? [];
-    for (const candidate of candidates) {
-      const parts = candidate.content?.parts ?? [];
-      const combined = parts.map((part) => part.text ?? '').join('');
-      if (combined.trim()) {
-        return combined;
-      }
+  private readNavStateNumber(state: Record<string, unknown>, key: string): number | null {
+    const value = state[key];
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null;
     }
-    return undefined;
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+    return null;
   }
+
 }

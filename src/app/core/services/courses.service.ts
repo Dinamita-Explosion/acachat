@@ -53,7 +53,27 @@ export interface CourseFileDto {
   mimetype: string;
   uploaded_by: number;
   uploaded_at: string | null;
+  has_parsed_content?: boolean;
+  parsed_at?: string | null;
 }
+
+export interface CourseFilesResponse {
+  course: {
+    id: number;
+    nombre: string;
+  };
+  files: CourseFileDto[];
+  total: number;
+}
+
+export type CourseUpdatePayload = Partial<{
+  nombre: string;
+  prompt: string | null;
+  emoji: string | null;
+  institution_id: number;
+  grade_id: number | null;
+  is_active: boolean;
+}>;
 
 @Injectable({ providedIn: 'root' })
 export class CoursesService {
@@ -119,5 +139,25 @@ export class CoursesService {
     return this.http
       .post<{ file: CourseFileDto }>(`${this.apiBaseUrl}/courses/${courseId}/files`, formData)
       .pipe(map((response) => response.file));
+  }
+
+  getCourseById(courseId: number): Observable<CourseDto> {
+    return this.http.get<CourseDto>(`${this.apiBaseUrl}/courses/${courseId}`);
+  }
+
+  updateCourse(courseId: number, payload: CourseUpdatePayload): Observable<CourseDto> {
+    return this.http
+      .put<{ course: CourseDto }>(`${this.apiBaseUrl}/courses/${courseId}`, payload)
+      .pipe(map((response) => response.course));
+  }
+
+  listCourseFiles(courseId: number): Observable<CourseFilesResponse> {
+    return this.http.get<CourseFilesResponse>(`${this.apiBaseUrl}/courses/${courseId}/files`);
+  }
+
+  deleteCourseFile(fileId: number): Observable<void> {
+    return this.http
+      .delete<{ msg?: string }>(`${this.apiBaseUrl}/files/${fileId}`)
+      .pipe(map(() => void 0));
   }
 }

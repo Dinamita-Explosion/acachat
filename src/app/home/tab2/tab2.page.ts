@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
@@ -10,15 +10,12 @@ import { CoursesService, CourseEnrollment } from '../../core/services/courses.se
 import { ThemeService, ThemePalette } from '../../core/services/theme.service';
 import { API_BASE_URL } from '../../core/tokens/api.token';
 import { buildCourseBadge, buildInitials, resolveUploadedAssetUrl } from '../../core/utils/display.utils';
-import { ToastController } from '@ionic/angular';
 import { AuthUser } from '../../core/models/auth.models';
-import { addIcons } from 'ionicons';
-import { cloudUpload } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
-  imports: [CommonModule, IonContent, IonIcon, IonButton, TopbarComponent, CourseCardComponent],
+  imports: [CommonModule, IonContent, TopbarComponent, CourseCardComponent],
 })
 export class Tab2Page {
   private readonly auth = inject(AuthService);
@@ -26,7 +23,6 @@ export class Tab2Page {
   private readonly theme = inject(ThemeService);
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly router = inject(Router);
-  private readonly toastController = inject(ToastController);
 
   readonly viewModel$ = combineLatest([
     this.auth.currentUser$,
@@ -39,7 +35,7 @@ export class Tab2Page {
       const institutionLogo = resolveUploadedAssetUrl(this.apiBaseUrl, institution?.logotipo ?? null);
       const filtered = this.filterEnrollmentsForUser(user, enrollments);
       const courses = filtered
-        .map((enrollment) => this.mapCourse(enrollment, palette))
+        .map((enrollment) => this.mapCourse(enrollment, palette, user))
         .sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
 
       return {
@@ -52,10 +48,7 @@ export class Tab2Page {
     })
   );
 
-  uploadingCourseId: number | null = null;
-
   constructor() {
-    addIcons({ cloudUpload });
     void this.coursesService.loadMyCourses().catch(() => undefined);
   }
 
@@ -66,21 +59,24 @@ export class Tab2Page {
   onOpenCourse(course: CourseCardView) {
     this.router.navigate(['/chat'], {
       state: {
+        courseId: course.id,
         title: course.title || 'Chatbot',
         subtitle: course.subtitle || '',
         color: course.color,
         emoji: course.badge,
+        canManage: course.canManage,
       },
     });
   }
 
-  private mapCourse(enrollment: CourseEnrollment, palette: ThemePalette): CourseCardView {
+  private mapCourse(enrollment: CourseEnrollment, palette: ThemePalette, user: AuthUser | null): CourseCardView {
     const course = enrollment.course;
     const institution = course?.institution ?? null;
     const color = institution?.colorinstitucional?.trim() || palette.primary;
     const logo = resolveUploadedAssetUrl(this.apiBaseUrl, institution?.logotipo ?? null);
     const badge = course?.emoji ?? buildCourseBadge(course?.nombre ?? '');
     const isTeacher = enrollment.role_in_course === 'teacher';
+    const isAdmin = user?.role === 'admin';
     const gradeLabel = course?.grade?.name ?? 'Sin grado asignado';
     const institutionName = institution?.nombre ?? 'Sin institución';
     const description = `${gradeLabel} · ${institutionName}`;
@@ -95,36 +91,8 @@ export class Tab2Page {
       period,
       color,
       logo,
-      canUpload: isTeacher,
+      canManage: Boolean(isTeacher || isAdmin),
     };
-  }
-
-  onUploadClick(input: HTMLInputElement) {
-    input.value = '';
-    input.click();
-  }
-
-  async onFileSelected(event: Event, course: CourseCardView): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    this.uploadingCourseId = course.id;
-    this.coursesService.uploadCourseFile(course.id, file).subscribe({
-      next: async () => {
-        this.uploadingCourseId = null;
-        await this.presentToast('Archivo cargado correctamente.', 'success');
-        input.value = '';
-      },
-      error: async (error) => {
-        this.uploadingCourseId = null;
-        const message = error?.error?.msg ?? 'No se pudo subir el archivo.';
-        await this.presentToast(message, 'danger');
-        input.value = '';
-      },
-    });
   }
 
   private filterEnrollmentsForUser(user: AuthUser | null, enrollments: CourseEnrollment[] | null | undefined): CourseEnrollment[] {
@@ -140,15 +108,6 @@ export class Tab2Page {
     return enrollments;
   }
 
-  private async presentToast(message: string, color: 'success' | 'danger') {
-    const toast = await this.toastController.create({
-      message,
-      color,
-      duration: 2500,
-      position: 'bottom',
-    });
-    await toast.present();
-  }
 }
 
 interface CourseCardView {
@@ -160,7 +119,7 @@ interface CourseCardView {
   period: string;
   color: string;
   logo: string | null;
-  canUpload: boolean;
+  canManage: boolean;
 }
 
 interface Tab2ViewModel {

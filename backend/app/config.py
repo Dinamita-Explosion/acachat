@@ -67,7 +67,7 @@ class Config:
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:8100").split(",")
 
     # Rate Limiting
-    RATELIMIT_STORAGE_URL = "memory://"
+    RATELIMIT_STORAGE_URI = "memory://"
     RATELIMIT_DEFAULT = "100 per hour"
 
     # Archivos
