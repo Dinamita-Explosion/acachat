@@ -103,8 +103,12 @@ export class ChatPage {
     }
 
     const currentUser = this.auth.getCurrentUser();
-    if (!this.canManageCourse && currentUser?.role === 'admin') {
+
+    if (currentUser?.role === 'admin') {
       this.canManageCourse = true;
+    } else if (currentUser?.role !== 'teacher') {
+      // Estudiantes u otros roles no pueden gestionar el curso aunque el estado previo lo indique.
+      this.canManageCourse = false;
     }
 
     this.buildMenuActions();

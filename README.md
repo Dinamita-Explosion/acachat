@@ -97,9 +97,51 @@
 
 ## Backend
 
-- Ubícate en `backend/` y activa el entorno virtual: `python3 -m venv venv && source venv/bin/activate`.
-- Instala dependencias: `pip install -r requirements.txt`.
-- Copia `.env.example` a `.env` y completa tus credenciales; la app crea la base de datos si no existe.
-- Ejecuta migraciones: `FLASK_APP=app:create_app flask db upgrade`.
-- (Opcional) Poblado rápido: `FLASK_APP=app:create_app flask seed-db`.
-- Arranca el backend: `python run.py` (usa `BACKEND_PORT` / `BACKEND_HOST` para personalizar).
+### Preparación en macOS / Linux
+1. `cd backend`
+2. Crear y activar entorno virtual: `python3 -m venv venv && source venv/bin/activate`
+3. Instalar dependencias: `pip install -r requirements.txt`
+4. Renombrar `.env.example` a `.env` (`mv .env.example .env`) y ajustar sólo los valores marcados como `changeme_*` y la API key de Gemini.
+5. (Opcional) Reiniciar base local:
+   ```bash
+   mysql -u <usuario> -p -e "DROP DATABASE IF EXISTS acachat_db; CREATE DATABASE acachat_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   ```
+6. Exportar app de Flask: `export FLASK_APP=app:create_app`
+7. Aplicar migraciones: `flask db upgrade`
+8. Poblar datos de ejemplo (usuarios, cursos, archivos y logos): `python3 seed_data.py`
+9. Levantar el backend: `python3 run.py` (o `flask run` si prefieres)
+
+### Preparación en Windows (PowerShell)
+1. `cd backend`
+2. Crear entorno: `py -3 -m venv venv`
+3. Activar: `.\venv\Scripts\Activate`
+4. Instalar dependencias: `pip install -r requirements.txt`
+5. Renombrar `.env.example` a `.env` (`Rename-Item .env.example .env`) y editar los valores `changeme_*` junto con `GEMINI_API_KEY`.
+6. (Opcional) Reiniciar base:
+   ```powershell
+   mysql -u <usuario> -p -e "DROP DATABASE IF EXISTS acachat_db; CREATE DATABASE acachat_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   ```
+7. Definir app de Flask: `$env:FLASK_APP = 'app:create_app'`
+8. Migraciones: `flask db upgrade`
+9. Seed con datos y archivos ficticios: `python seed_data.py`
+10. Iniciar API: `python run.py`
+
+> El seeder copia automáticamente los logos desde `backend/seeder/` a `uploads/institutions/logos/` y crea material de apoyo en `uploads/courses/<id>/` para que el chatbot tenga contexto desde el primer arranque.
+
+### Diagrama de la base de datos (ER)
+
+![Diagrama ER](./diagram_db.png)
+
+### Credenciales de ejemplo
+- **Colegio Inglés de Quillota**
+  - Admin: `matias.diaz.c01@mail.pucv.cl` / `Admin1234`
+  - Profesor: `matias.diaz@colegioinglesquillota.cl` / `Profesor1234`
+  - Estudiante: `alumno1@inglesquillota.cl` / `Alumno1234`
+- **Liceo Gastronomía y Turismo**
+  - Admin: `giovanni.ahumada.t@mail.pucv.cl` / `Admin1234`
+  - Profesor: `giovanni.ahumada@lgt.cl` / `Profesor1234`
+  - Estudiante: `alumno1@turismo.cl` / `Alumno1234`
+- **Instituto Rafael Ariztía**
+  - Admin: `daniel.saavedra.e@mail.pucv.cl` / `Admin1234`
+  - Profesor: `daniel.saavedra@ira.cl` / `Profesor1234`
+  - Estudiante: `alumno1@maristas.cl` / `Alumno1234`
