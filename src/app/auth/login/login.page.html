@@ -51,11 +51,26 @@
 
         <!-- Actions -->
         <div class="grid gap-4 pt-1">
-          <app-themed-button type="button" variant="primary" (clicked)="onLogin()">Iniciar sesión</app-themed-button>
+          <app-themed-button
+            type="button"
+            variant="primary"
+            [disabled]="isLoading"
+            (clicked)="onLogin()">
+            <ng-container *ngIf="!isLoading; else loadingTpl">Iniciar sesión</ng-container>
+          </app-themed-button>
           <app-themed-button type="button" variant="secondary" (clicked)="goToRegister()">
             Crear cuenta
           </app-themed-button>
         </div>
+
+        <p *ngIf="errorMessage" class="text-center text-sm text-red-500">{{ errorMessage }}</p>
+
+        <ng-template #loadingTpl>
+          <span class="flex items-center justify-center gap-2">
+            <ion-spinner name="crescent"></ion-spinner>
+            Procesando...
+          </span>
+        </ng-template>
 
         <!-- Divider and Socials -->
         <div class="mt-8 space-y-4">

@@ -42,6 +42,119 @@
 
 </ion-content>
 
+<ion-modal [isOpen]="isConfigOpen" (didDismiss)="closeConfiguration()" class="config-modal">
+  <ng-template>
+    <div class="max-h-[80vh] w-[min(520px,100vw)] overflow-y-auto bg-white p-6">
+      <div class="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-neutral-900">Configuración del curso</h2>
+          <p class="text-xs text-neutral-500" *ngIf="courseConfigName">Gestiona el chat de <strong>{{ courseConfigName }}</strong>.</p>
+        </div>
+        <button type="button" class="text-sm font-medium text-primary" (click)="closeConfiguration()">Cerrar</button>
+      </div>
+
+      <div *ngIf="configError" class="mb-4 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+        {{ configError }}
+      </div>
+
+      <div *ngIf="isConfigLoading && !configError" class="text-sm text-neutral-600">
+        Cargando configuración del curso...
+      </div>
+
+      <div *ngIf="!isConfigLoading && !configError" class="space-y-8">
+        <section>
+          <div class="mb-3">
+            <h3 class="text-sm font-semibold text-neutral-800">Prompt del curso</h3>
+            <p class="text-xs text-neutral-500">
+              Este mensaje se añade antes de cada conversación. Úsalo para definir objetivos, tono y reglas del asistente.
+            </p>
+          </div>
+          <textarea
+            class="h-36 w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm focus:border-brand-200 focus:outline-none focus:ring-1 focus:ring-brand-300"
+            [(ngModel)]="promptDraft"
+            placeholder="Ej: Responde como profesor/a del curso, priorizando los contenidos del temario oficial..."
+          ></textarea>
+          <div class="mt-3 flex flex-wrap items-center gap-3">
+            <ion-button size="small" (click)="savePrompt()" [disabled]="isSavingPrompt">
+              <ion-icon slot="start" name="save-outline"></ion-icon>
+              Guardar prompt
+            </ion-button>
+            <span *ngIf="isSavingPrompt" class="text-xs text-neutral-500">Guardando...</span>
+            <span *ngIf="promptSaveMessage && !isSavingPrompt" class="text-xs text-green-600">{{ promptSaveMessage }}</span>
+          </div>
+        </section>
+
+        <section>
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-semibold text-neutral-800">Archivos del curso</h3>
+              <p class="text-xs text-neutral-500">
+                Los archivos parseados se añaden automáticamente al contexto del chatbot.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                type="file"
+                #configFileInput
+                class="hidden"
+                (change)="onConfigFileSelected($event)"
+                [disabled]="isUploadingFile"
+              />
+              <ion-button size="small" fill="outline" (click)="configFileInput.click()" [disabled]="isUploadingFile">
+                <ion-icon slot="start" name="cloud-upload"></ion-icon>
+                {{ isUploadingFile ? 'Subiendo...' : 'Agregar archivo' }}
+              </ion-button>
+            </div>
+          </div>
+
+          <div *ngIf="uploadError" class="mb-3 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">
+            {{ uploadError }}
+          </div>
+          <div *ngIf="filesMessage" class="mb-3 rounded-xl border border-green-100 bg-green-50 px-3 py-2 text-xs text-green-700">
+            {{ filesMessage }}
+          </div>
+
+          <div *ngIf="isFilesLoading" class="text-xs text-neutral-500">
+            Actualizando lista de archivos...
+          </div>
+
+          <ng-container *ngIf="!isFilesLoading">
+            <div *ngIf="files.length === 0" class="rounded-xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-6 text-center text-xs text-neutral-500">
+              Aún no hay archivos cargados para este curso.
+            </div>
+
+            <div *ngIf="files.length" class="space-y-2">
+              <div
+                *ngFor="let file of files"
+                class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm"
+              >
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-medium text-neutral-800">{{ file.filename }}</p>
+                  <p class="text-xs text-neutral-500">
+                    Subido {{ file.uploaded_at ? (file.uploaded_at | date: 'short') : 'sin fecha' }}
+                    · Tamaño {{ file.filesize | number }} bytes
+                    <span *ngIf="file.has_parsed_content"> · Parseado</span>
+                  </p>
+                </div>
+                <ion-button
+                  size="small"
+                  fill="clear"
+                  color="danger"
+                  (click)="deleteFile(file.id)"
+                  [disabled]="isDeletingFileId === file.id"
+                >
+                  <ion-icon slot="start" name="trash-outline"></ion-icon>
+                  {{ isDeletingFileId === file.id ? 'Eliminando...' : 'Eliminar' }}
+                </ion-button>
+              </div>
+            </div>
+          </ng-container>
+        </section>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>
+
 <app-action-menu
   [isOpen]="isOptionsOpen"
   [event]="optionsEvent"

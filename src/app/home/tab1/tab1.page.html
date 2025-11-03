@@ -1,50 +1,79 @@
 <ion-content [fullscreen]="true" class="bg-white">
-  <!-- Topbar como componente -->
-  <app-topbar [logoSrc]="logoSrc" [avatarSrc]="avatarSrc" (avatarClicked)="goToProfile()"></app-topbar>
+  <ng-container *ngIf="viewModel$ | async as vm">
+    <app-topbar
+      [logoSrc]="vm.institutionLogo"
+      [avatarSrc]="null"
+      [userInitials]="vm.initials"
+      (avatarClicked)="goToProfile()"
+      (logoClicked)="openInstitutionInfo(vm)"></app-topbar>
 
-  <!-- Contenido -->
-  <div class="px-4 py-3">
-    <!-- Saludo con texto más grueso -->
-    <h1 class="text-2xl font-bold text-primary">¡Hola, Nicolás!</h1>
-    <p class="text-md text-brand-700 mt-1 font-light">¡Qué bueno volver a verte! :)</p>
-  </div>
-
-  <!-- Tarjetas: mismo alto que placeholders (h-32). 1 full + 2 en una fila -->
-  <div class="px-4 py-3 space-y-4">
-    <!-- Curso (única tarjeta de curso) -->
-    <div class="flex h-32 items-center justify-between rounded-2xl bg-neutral-800 p-4 shadow-md">
-      <div>
-        <div class="text-xs font-semibold uppercase tracking-wide text-white/70">Curso</div>
-        <div class="mt-1 text-2xl font-bold text-white">1° Medio A</div>
-      </div>
-      <ion-icon name="school-outline" class="text-brand-50 text-3xl"></ion-icon>
+    <div class="px-4 py-3">
+      <h1 class="text-2xl font-bold text-primary">
+        ¡Hola, {{ vm.user?.username || 'Usuario' }}!
+      </h1>
+      <p class="text-md mt-1 font-light text-brand-700">
+        <ng-container *ngIf="vm.institutionName; else defaultGreeting">
+          Bienvenido a {{ vm.institutionName }}.
+        </ng-container>
+        <ng-template #defaultGreeting>¡Qué bueno volver a verte! :)</ng-template>
+      </p>
     </div>
 
-    <!-- Fila con 2 tarjetas -->
-    <div class="grid grid-cols-2 gap-3">
-      <!-- Clima -->
-      <div class="flex h-32 flex-col justify-between rounded-2xl bg-neutral-800 p-4 shadow-md">
-        <div class="flex items-center justify-between">
-          <div class="text-xs font-semibold uppercase tracking-wide text-white/70">Clima</div>
-          <ion-icon name="sunny-outline" class="text-brand-50 text-xl"></ion-icon>
-        </div>
+    <div class="px-4 py-3 space-y-4">
+      <div
+        class="flex h-32 items-center justify-between rounded-2xl p-4 shadow-md transition-colors"
+        [style.background]="vm.palette.primary"
+        [style.color]="vm.palette.contrast">
         <div>
-          <div class="text-lg font-bold text-white">22°C · Soleado</div>
-          <div class="text-xs text-white/70">Santiago · Viento 6 km/h</div>
+          <div class="text-xs font-semibold uppercase tracking-wide" style="opacity: 0.8">
+            Tu grado
+          </div>
+          <div class="mt-1 text-2xl font-bold">
+            {{ vm.gradeName }}
+          </div>
+          <div class="text-sm" style="opacity: 0.8">
+            <ng-container *ngIf="vm.institutionName; else noInstitution">
+              {{ vm.institutionName }}
+            </ng-container>
+          </div>
+          <ng-template #noInstitution>
+            <span>Sin institución asignada</span>
+          </ng-template>
         </div>
+        <ion-icon name="school-outline" class="text-3xl" [style.color]="vm.palette.contrast"></ion-icon>
       </div>
 
-      <!-- Día -->
-      <div class="flex h-32 flex-col justify-between rounded-2xl bg-neutral-800 p-4 shadow-md">
-        <div class="flex items-center justify-between">
-          <div class="text-xs font-semibold uppercase tracking-wide text-white/70">Día</div>
-          <ion-icon name="calendar-outline" class="text-brand-50 text-xl"></ion-icon>
+      <div class="grid grid-cols-2 gap-3">
+        <div
+          class="flex h-32 flex-col justify-between rounded-2xl p-4 shadow-md transition-colors"
+          [style.background]="vm.palette.muted"
+          [style.color]="vm.palette.mutedContrast">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-semibold uppercase tracking-wide" style="opacity: 0.75">Clima</div>
+            <ion-icon name="sunny-outline" class="text-xl" [style.color]="vm.palette.primary"></ion-icon>
+          </div>
+          <div>
+            <div class="text-lg font-semibold">22°C · Soleado</div>
+            <div class="text-xs" style="opacity: 0.75">
+              {{ vm.institutionName || 'Chile' }} · Viento 6 km/h
+            </div>
+          </div>
         </div>
-        <div>
-          <div class="text-lg font-bold text-white">{{ today | date: 'EEEE' | titlecase }}</div>
-          <div class="text-xs text-white/70">{{ today | date: 'd MMMM, y' }}</div>
+
+        <div
+          class="flex h-32 flex-col justify-between rounded-2xl p-4 shadow-md transition-colors"
+          [style.background]="vm.palette.muted"
+          [style.color]="vm.palette.mutedContrast">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-semibold uppercase tracking-wide" style="opacity: 0.75">Día</div>
+            <ion-icon name="calendar-outline" class="text-xl" [style.color]="vm.palette.primary"></ion-icon>
+          </div>
+          <div>
+            <div class="text-lg font-semibold">{{ today | date: 'EEEE' | titlecase }}</div>
+            <div class="text-xs" style="opacity: 0.75">{{ today | date: 'd MMMM, y' }}</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </ng-container>
 </ion-content>

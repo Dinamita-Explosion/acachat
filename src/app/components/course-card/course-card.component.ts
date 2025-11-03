@@ -27,15 +27,20 @@ import { IonicModule } from '@ionic/angular';
       [style.--box-shadow]="'0 4px 10px rgba(0,0,0,0.06)'"
     >
       <div class="flex w-full items-center rounded-3xl p-4 text-left">
-        <div class="mr-3 flex h-12 w-12 items-center justify-center rounded-full border bg-white text-2xl shadow"
+        <div class="mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border bg-white text-2xl shadow"
              [ngStyle]="emojiStyle">
-          {{ emoji }}
+          <ng-container *ngIf="thumbnailSrc; else emojiTemplate">
+            <img [src]="thumbnailSrc" alt="Logo" class="h-full w-full object-contain" loading="lazy" decoding="async" />
+          </ng-container>
+          <ng-template #emojiTemplate>
+            {{ emoji }}
+          </ng-template>
         </div>
         <div class="min-w-0 flex-1">
           <div class="truncate text-base font-semibold text-white">{{ title }}</div>
           <div class="mt-0.5 line-clamp-2 text-sm text-white/90">{{ description }}</div>
           <div class="mt-2 flex items-center gap-3 text-xs text-white/80">
-            <div>Profesor: <span class="font-medium text-white">{{ professor }}</span></div>
+            <div>Detalle: <span class="font-medium text-white">{{ professor }}</span></div>
             <div>Periodo: <span class="font-medium text-white">{{ period }}</span></div>
           </div>
         </div>
@@ -50,6 +55,7 @@ export class CourseCardComponent {
   @Input() professor = '';
   @Input() period = '';
   @Input() color = '#4a3aff';
+  @Input() thumbnailSrc: string | null = null;
   @Output() pressed = new EventEmitter<void>();
 
   get gradientCss() {

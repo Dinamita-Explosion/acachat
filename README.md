@@ -94,3 +94,63 @@
 [![Angular](https://img.shields.io/badge/Angular%20v15.0+-DD0031?style=flat&logo=angular&logoColor=white)](#)  
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS%20v4.0-06B6D4?style=flat&logo=tailwind-css&logoColor=white)](#)
 </div>
+
+## Backend
+
+> [!NOTE]
+> - Para la entrega parcial 2 solo está habilitado el uso de MySQL en el backend.
+> - Para cambiar el URL de la API en Frontend editar: `src/environments/environment.ts`.
+
+### Preparación en macOS / Linux
+1. `cd backend`
+2. Crear y activar entorno virtual: `python3 -m venv venv && source venv/bin/activate`
+3. Instalar dependencias: `pip install -r requirements.txt`
+4. Renombrar `.env.example` a `.env` (`mv .env.example .env`) y ajustar sólo los valores marcados como `changeme_*` y la API key de Gemini.
+5. (Opcional) Reiniciar base local:
+   ```bash
+   mysql -u <usuario> -p -e "DROP DATABASE IF EXISTS acachat_db; CREATE DATABASE acachat_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   ```
+6. Aplicar migraciones: `flask db upgrade`
+7. Poblar datos de ejemplo (usuarios, cursos, archivos y logos): `python3 seed_data.py`
+8. Levantar el backend: `python3 run.py` (o `flask run` si prefieres)
+
+### Preparación en Windows (PowerShell)
+1. `cd backend`
+2. Crear entorno: `py -3 -m venv venv`
+3. Activar: `.\venv\Scripts\Activate`
+4. Instalar dependencias: `pip install -r requirements.txt`
+5. Renombrar `.env.example` a `.env` (`Rename-Item .env.example .env`) y editar los valores `changeme_*` junto con `GEMINI_API_KEY`.
+6. (Opcional) Reiniciar base:
+   ```powershell
+   mysql -u <usuario> -p -e "DROP DATABASE IF EXISTS acachat_db; CREATE DATABASE acachat_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   ```
+7. Migraciones: `flask db upgrade`
+8. Seed con datos y archivos ficticios: `python seed_data.py`
+9. Iniciar API: `python run.py`
+
+> El seeder copia automáticamente los logos desde `backend/seeder/` a `uploads/institutions/logos/` y crea material de apoyo en `uploads/courses/<id>/` para que el chatbot tenga contexto desde el primer arranque.
+
+### Diagrama de la base de datos (ER)
+
+![Diagrama ER](./diagram_db.png)
+
+### Credenciales de ejemplo
+
+> [!CAUTION]
+> Al momento de registrar un nuevo usuario, se tiene que tener en cuenta que: 
+> - El rut tiene que ser uno real validado con digito verificador y guión.
+> - La contraseña tiene que tener aunque sea un mayúscula y mínimo de digitos de 8 además de el uso de números.
+> - El correo tiene que terminar con @[dominio].[tdl].
+
+- **Colegio Inglés de Quillota**
+  - Admin: `matias.diaz.c01@mail.pucv.cl` / `Admin1234`
+  - Profesor: `matias.diaz@colegioinglesquillota.cl` / `Profesor1234`
+  - Estudiante: `alumno1@inglesquillota.cl` / `Alumno1234`
+- **Liceo Gastronomía y Turismo**
+  - Admin: `giovanni.ahumada.t@mail.pucv.cl` / `Admin1234`
+  - Profesor: `giovanni.ahumada@lgt.cl` / `Profesor1234`
+  - Estudiante: `alumno1@turismo.cl` / `Alumno1234`
+- **Instituto Rafael Ariztía**
+  - Admin: `daniel.saavedra.e@mail.pucv.cl` / `Admin1234`
+  - Profesor: `daniel.saavedra@ira.cl` / `Profesor1234`
+  - Estudiante: `alumno1@maristas.cl` / `Alumno1234`

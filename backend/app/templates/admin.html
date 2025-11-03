@@ -1,0 +1,3120 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACACHAT · Panel Admin</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --color-primary: #4a3aff;
+        --color-primary-dark: #2f24a5;
+        --color-secondary: #5e58d4;
+        --color-success: #16a34a;
+        --color-danger: #ef4444;
+        --color-warning: #f97316;
+        --color-info: #3b82f6;
+        --color-brand-25: #f7f9ff;
+        --color-brand-50: #eff2ff;
+        --color-brand-100: #e3e7ff;
+        --color-neutral-50: #f8fafc;
+        --color-neutral-100: #eef2f7;
+        --color-neutral-200: #d7deea;
+        --color-neutral-300: #c2cbd9;
+        --color-neutral-500: #667085;
+        --color-neutral-700: #344054;
+        --color-neutral-900: #111827;
+        --radius-xl: 28px;
+        --radius-lg: 20px;
+        --radius-md: 14px;
+        --radius-sm: 10px;
+        --shadow-card: 0 24px 55px -30px rgba(37, 56, 88, 0.6);
+        --shadow-soft: 0 20px 50px -40px rgba(37, 56, 88, 0.6);
+        --transition: 0.2s ease;
+        font-size: 16px;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: linear-gradient(180deg, rgba(74, 58, 255, 0.15) 0%, rgba(241, 244, 255, 0.95) 100%);
+        color: var(--color-neutral-900);
+        padding: clamp(16px, 4vw, 36px);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        font-family: inherit;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .view {
+        width: 100%;
+      }
+
+      .login-view {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - clamp(16px, 4vw, 36px) * 2);
+      }
+
+      .login-card {
+        background: #fff;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-card);
+        padding: clamp(32px, 6vw, 56px);
+        max-width: 420px;
+        width: 100%;
+      }
+
+      .login-card h1 {
+        margin: 0 0 6px;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--color-neutral-900);
+      }
+
+      .login-card p {
+        margin: 0 0 32px;
+        color: var(--color-neutral-500);
+        font-size: 0.95rem;
+      }
+
+      label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--color-neutral-700);
+      }
+
+      input[type="email"],
+      input[type="password"],
+      input[type="text"],
+      input[type="search"],
+      input[type="date"],
+      input[type="color"],
+      input[type="number"],
+      select,
+      textarea {
+        width: 100%;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-neutral-200);
+        background: var(--color-brand-25);
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        transition: border var(--transition), box-shadow var(--transition), background var(--transition);
+        color: var(--color-neutral-900);
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(74, 58, 255, 0.12);
+        background: #fff;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+      }
+
+      .btn:active {
+        transform: scale(0.98);
+      }
+
+      .btn-primary {
+        background: var(--color-primary);
+        color: #fff;
+        box-shadow: 0 15px 30px -18px rgba(74, 58, 255, 0.65);
+      }
+
+      .btn-primary:hover {
+        background: var(--color-primary-dark);
+      }
+
+      .btn-secondary {
+        background: rgba(74, 58, 255, 0.1);
+        color: var(--color-primary);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(74, 58, 255, 0.18);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--color-primary);
+      }
+
+      .btn-ghost:hover {
+        background: rgba(74, 58, 255, 0.12);
+      }
+
+      .btn-danger {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--color-danger);
+      }
+
+      .btn-danger:hover {
+        background: rgba(239, 68, 68, 0.2);
+      }
+
+      .btn-sm {
+        padding: 7px 14px;
+        font-size: 0.85rem;
+      }
+
+      .error-banner {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--color-danger);
+        border-radius: var(--radius-md);
+        padding: 12px 14px;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      .app-root {
+        max-width: 1280px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .app-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: clamp(18px, 3vw, 32px);
+        background: linear-gradient(90deg, rgba(74, 58, 255, 0.08) 0%, rgba(74, 58, 255, 0) 100%);
+        border-bottom: 1px solid rgba(74, 58, 255, 0.08);
+      }
+
+      .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.7rem;
+        font-weight: 700;
+        box-shadow: 0 20px 35px -28px rgba(74, 58, 255, 0.85);
+      }
+
+      .brand-text strong {
+        display: block;
+        font-size: 1.4rem;
+      }
+
+      .brand-text span {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--color-neutral-500);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+
+      .user-chip {
+        border-radius: 999px;
+        padding: 10px 18px;
+        background: rgba(74, 58, 255, 0.1);
+        color: var(--color-primary);
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .user-chip span {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--color-neutral-500);
+        margin-top: 2px;
+      }
+
+      .app-body {
+        padding: clamp(20px, 3vw, 36px);
+      }
+
+      .tab-switcher {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: var(--color-brand-25);
+        border-radius: var(--radius-lg);
+        padding: 12px;
+        margin-bottom: 24px;
+      }
+
+      .tab-btn {
+        border: none;
+        background: transparent;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-weight: 600;
+        color: var(--color-neutral-500);
+        cursor: pointer;
+        transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+      }
+
+      .tab-btn.active {
+        background: #fff;
+        color: var(--color-primary);
+        box-shadow: 0 10px 22px -20px rgba(74, 58, 255, 0.85);
+      }
+
+      .tab-pane {
+        display: none;
+      }
+
+      .tab-pane.active {
+        display: block;
+      }
+
+      .stats-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, rgba(74, 58, 255, 0.18) 0%, rgba(74, 58, 255, 0.05) 100%);
+        padding: 20px;
+        color: var(--color-neutral-900);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .stat-card h3 {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--color-neutral-500);
+      }
+
+      .stat-card strong {
+        display: block;
+        font-size: 2.1rem;
+        margin-top: 6px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(74, 58, 255, 0.05);
+      }
+
+      .layout-columns {
+        display: grid;
+        gap: 22px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      @media (min-width: 1024px) {
+        .layout-columns {
+          grid-template-columns: 360px minmax(0, 1fr);
+        }
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-height: 74vh;
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+
+      .institution-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        padding: 18px;
+        border: 1px solid rgba(74, 58, 255, 0.08);
+        box-shadow: 0 14px 30px -26px rgba(74, 58, 255, 0.75);
+        cursor: pointer;
+        transition: transform var(--transition), box-shadow var(--transition), border var(--transition);
+      }
+
+      .institution-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 38px -30px rgba(74, 58, 255, 0.85);
+      }
+
+      .institution-card.active {
+        border-color: rgba(74, 58, 255, 0.45);
+        box-shadow: 0 24px 46px -32px rgba(74, 58, 255, 0.9);
+      }
+
+      .institution-card header {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .institution-logo {
+        width: 54px;
+        height: 54px;
+        border-radius: 18px;
+        background: rgba(74, 58, 255, 0.12);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--color-primary);
+        overflow: hidden;
+      }
+
+      .institution-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .institution-meta h3 {
+        margin: 0;
+        font-size: 1.05rem;
+      }
+
+      .institution-meta span {
+        font-size: 0.8rem;
+        color: var(--color-neutral-500);
+      }
+
+      .detail-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .detail-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        padding: clamp(20px, 2vw, 28px);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(74, 58, 255, 0.04);
+      }
+
+      .detail-card h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+      }
+
+      .meta-line {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 0.85rem;
+        color: var(--color-neutral-500);
+        margin-bottom: 18px;
+      }
+
+      .course-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .course-card {
+        border-radius: var(--radius-md);
+        padding: 16px;
+        border: 1px solid rgba(74, 58, 255, 0.1);
+        background: linear-gradient(120deg, rgba(74, 58, 255, 0.08) 0%, rgba(255, 255, 255, 0.92) 100%);
+      }
+
+      .course-card header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .course-card h4 {
+        margin: 0;
+      }
+
+      .course-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        color: var(--color-neutral-500);
+        font-size: 0.8rem;
+      }
+
+      .chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .chip {
+        border-radius: 999px;
+        padding: 6px 12px;
+        background: rgba(74, 58, 255, 0.12);
+        color: var(--color-primary);
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .badge-success {
+        background: rgba(34, 197, 94, 0.12);
+        color: var(--color-success);
+      }
+
+      .badge-muted {
+        background: rgba(148, 163, 184, 0.18);
+        color: var(--color-neutral-500);
+      }
+
+      .badge-info {
+        background: rgba(74, 58, 255, 0.12);
+        color: var(--color-primary);
+      }
+
+      .form-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        padding: clamp(20px, 2vw, 28px);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(74, 58, 255, 0.05);
+      }
+
+      .form-card header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 14px 12px;
+        border-bottom: 1px solid rgba(74, 58, 255, 0.08);
+        font-size: 0.88rem;
+      }
+
+      th {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--color-neutral-500);
+      }
+
+      tbody tr:hover {
+        background: rgba(74, 58, 255, 0.05);
+      }
+
+      .user-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(74, 58, 255, 0.12);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+
+      .status {
+        font-size: 0.78rem;
+        font-weight: 600;
+      }
+
+      .status-active {
+        color: var(--color-success);
+      }
+
+      .status-inactive {
+        color: var(--color-neutral-500);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 32px 12px;
+        font-size: 0.95rem;
+        color: var(--color-neutral-500);
+      }
+
+      .chat-card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(74, 58, 255, 0.06);
+        box-shadow: var(--shadow-soft);
+        overflow: hidden;
+      }
+
+      .chat-header {
+        padding: 20px 22px 12px;
+        border-bottom: 1px solid rgba(74, 58, 255, 0.08);
+      }
+
+      .chat-header h3 {
+        margin: 0;
+      }
+
+      .chat-header span {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.8rem;
+        color: var(--color-neutral-500);
+      }
+
+      .chat-controls {
+        display: flex;
+        gap: 8px;
+        padding: 0 22px 12px;
+        justify-content: flex-end;
+      }
+
+      .chat-status {
+        padding: 0 22px 10px;
+        font-size: 0.8rem;
+        color: var(--color-neutral-500);
+      }
+
+      .chat-messages {
+        max-height: 320px;
+        overflow-y: auto;
+        padding: 0 22px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .chat-bubble {
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        box-shadow: 0 18px 30px -26px rgba(15, 23, 42, 0.8);
+      }
+
+      .chat-bubble.user {
+        align-self: flex-end;
+        background: var(--color-primary);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+      }
+
+      .chat-bubble.bot {
+        align-self: flex-start;
+        background: rgba(74, 58, 255, 0.1);
+        color: var(--color-neutral-700);
+        border-bottom-left-radius: 4px;
+      }
+
+      .chat-bubble small {
+        display: block;
+        margin-top: 8px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        opacity: 0.7;
+      }
+
+      .chat-form {
+        padding: 18px 22px 22px;
+        border-top: 1px solid rgba(74, 58, 255, 0.08);
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+      }
+
+      .chat-form textarea {
+        flex: 1;
+        min-height: 70px;
+        max-height: 160px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        background: #1f2937;
+        color: #fff;
+        padding: 14px 18px;
+        border-radius: var(--radius-md);
+        box-shadow: 0 22px 40px -26px rgba(15, 23, 42, 0.9);
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        z-index: 30;
+      }
+
+      .toast.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast[data-type="success"] {
+        background: var(--color-success);
+      }
+
+      .toast[data-type="error"] {
+        background: var(--color-danger);
+      }
+
+      .busy {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 40;
+      }
+
+      .busy.hidden {
+        display: none;
+      }
+
+      .busy .box {
+        background: #fff;
+        padding: 18px 28px;
+        border-radius: var(--radius-lg);
+        font-weight: 600;
+        color: var(--color-neutral-700);
+        box-shadow: var(--shadow-soft);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="login-view" class="view login-view">
+      <div class="login-card">
+        <h1>ACACHAT Admin</h1>
+        <p>Acceso exclusivo para administradores. Gestiona instituciones, cursos y usuarios desde un tablero amigable.</p>
+        <form id="login-form">
+          <div class="form-card" style="box-shadow:none; border:none; padding:0;">
+            <div style="display:flex; flex-direction:column; gap:18px;">
+              <div>
+                <label for="login-email">Correo electrónico</label>
+                <input type="email" id="login-email" name="email" placeholder="admin@acachat.cl" required />
+              </div>
+              <div>
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" name="password" placeholder="••••••••" required minlength="8" />
+              </div>
+            </div>
+            <div id="login-error" class="error-banner hidden" style="margin-top:18px;"></div>
+            <div class="form-actions" style="margin-top:26px; justify-content:flex-end;">
+              <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="app-root" class="view app-root hidden">
+      <header class="app-header">
+        <div class="header-brand">
+          <div class="brand-icon">💠</div>
+          <div class="brand-text">
+            <strong>ACACHAT Admin</strong>
+            <span>Supervisa instituciones, cursos y matriculas en segundos</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <div class="user-chip">
+            <div>
+              <strong id="header-user-name">Admin</strong>
+              <span id="header-user-email">admin@acachat.cl</span>
+            </div>
+          </div>
+          <button id="refresh-all" type="button" class="btn btn-secondary">Actualizar todo</button>
+          <button id="logout-btn" type="button" class="btn btn-danger">Cerrar sesión</button>
+        </div>
+      </header>
+
+      <main class="app-body">
+        <nav class="tab-switcher" id="main-tabs">
+          <button type="button" class="tab-btn active" data-tab="overview">Resumen</button>
+          <button type="button" class="tab-btn" data-tab="institutions">Instituciones</button>
+          <button type="button" class="tab-btn" data-tab="users">Usuarios</button>
+          <button type="button" class="tab-btn" data-tab="grades">Grados</button>
+          <button type="button" class="tab-btn" data-tab="enrollments">Matrículas</button>
+        </nav>
+
+        <section id="tab-overview" class="tab-pane active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>Instituciones activas</h3>
+              <strong id="stat-institutions">0</strong>
+              <span>Total registradas en la plataforma</span>
+            </div>
+            <div class="stat-card">
+              <h3>Cursos con chatbot</h3>
+              <strong id="stat-courses">0</strong>
+              <span>Disponibles para docentes y estudiantes</span>
+            </div>
+            <div class="stat-card">
+              <h3>Profesores</h3>
+              <strong id="stat-teachers">0</strong>
+              <span>Usuarios con rol docente</span>
+            </div>
+            <div class="stat-card">
+              <h3>Estudiantes</h3>
+              <strong id="stat-students">0</strong>
+              <span>Usuarios con rol estudiante</span>
+            </div>
+          </div>
+
+          <div class="layout-columns" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+            <div class="card">
+              <h3>Últimas instituciones</h3>
+              <ul class="stack" id="overview-institution-list" style="max-height:none; list-style:none; padding:0; margin:0;"></ul>
+            </div>
+            <div class="card">
+              <h3>Cursos con mayor actividad</h3>
+              <ul class="stack" id="overview-course-list" style="max-height:none; list-style:none; padding:0; margin:0;"></ul>
+            </div>
+            <div class="card">
+              <h3>Notas rápidas</h3>
+              <p style="font-size:0.92rem; color:var(--color-neutral-500); line-height:1.6;">
+                Gestiona colores y logotipos para mantener la identidad de cada institución, crea cursos específicos y prueba el chatbot en contexto para validar prompts y materiales. Todo sin salir de un panel compacto inspirado en la app móvil ✨
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-institutions" class="tab-pane">
+          <div class="card" style="margin-bottom:18px;">
+            <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center;">
+              <div>
+                <h2 style="margin:0;">Instituciones</h2>
+                <p style="margin:4px 0 0; color:var(--color-neutral-500); font-size:0.9rem;">
+                  Administra datos institucionales, cursos asociados y prueba el chatbot de cada asignatura.
+                </p>
+              </div>
+              <div style="display:flex; gap:12px;">
+                <button id="institutions-refresh" type="button" class="btn btn-secondary">Recargar</button>
+                <button id="institution-create-btn" type="button" class="btn btn-primary">Nueva institución</button>
+              </div>
+            </div>
+            <div style="margin-top:18px;">
+              <input type="search" id="institution-search" placeholder="Buscar institución por nombre, dirección o comuna..." />
+            </div>
+          </div>
+
+          <div class="layout-columns">
+            <div class="stack" id="institutions-list"></div>
+            <div id="institution-detail" class="detail-stack">
+              <div class="detail-card">
+                <div class="empty-state">Selecciona una institución para ver sus detalles.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-users" class="tab-pane">
+          <div class="card" style="margin-bottom:18px;">
+            <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center;">
+              <div>
+                <h2 style="margin:0;">Usuarios</h2>
+                <p style="margin:4px 0 0; color:var(--color-neutral-500); font-size:0.9rem;">
+                  Crea cuentas, ajusta roles y activa o bloquea accesos de manera centralizada.
+                </p>
+              </div>
+              <div style="display:flex; gap:12px;">
+                <button id="users-refresh" type="button" class="btn btn-secondary">Recargar</button>
+                <button id="user-create-btn" type="button" class="btn btn-primary">Nuevo usuario</button>
+              </div>
+            </div>
+            <div style="margin-top:18px; display:flex; gap:16px; flex-wrap:wrap;">
+              <div style="min-width:220px;">
+                <label for="users-role-filter">Filtrar por rol</label>
+                <select id="users-role-filter">
+                  <option value="all">Todos</option>
+                  <option value="admin">Administradores</option>
+                  <option value="teacher">Profesores</option>
+                  <option value="student">Estudiantes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="user-form-container" class="form-card hidden" style="margin-bottom:18px;"></div>
+
+          <div class="card" style="padding:0;">
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Usuario</th>
+                    <th>RUT</th>
+                    <th>Rol</th>
+                    <th>Institución</th>
+                    <th>Grado</th>
+                    <th>Ubicación</th>
+                    <th>Creado</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody">
+                  <tr><td colspan="9" class="empty-state">Sin datos.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-grades" class="tab-pane">
+          <div class="card" style="margin-bottom:18px;">
+            <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center;">
+              <div>
+                <h2 style="margin:0;">Grados académicos</h2>
+                <p style="margin:4px 0 0; color:var(--color-neutral-500); font-size:0.9rem;">
+                  Gestiona niveles educativos disponibles para cursos y usuarios.
+                </p>
+              </div>
+              <div style="display:flex; gap:12px;">
+                <button id="grades-refresh" type="button" class="btn btn-secondary">Recargar</button>
+                <button id="grade-create-btn" type="button" class="btn btn-primary">Nuevo grado</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="grade-form-container" class="form-card hidden" style="margin-bottom:18px;"></div>
+
+          <div class="card" style="padding:0;">
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Orden</th>
+                    <th>Creado</th>
+                    <th>Actualizado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="grades-tbody">
+                  <tr><td colspan="5" class="empty-state">Sin datos.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-enrollments" class="tab-pane">
+          <div class="card" style="margin-bottom:18px;">
+            <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center;">
+              <div>
+                <h2 style="margin:0;">Matrículas</h2>
+                <p style="margin:4px 0 0; color:var(--color-neutral-500); font-size:0.9rem;">
+                  Visualiza y controla asignaciones activas por curso, rol y año académico.
+                </p>
+              </div>
+              <div style="display:flex; gap:12px;">
+                <button id="enrollments-refresh" type="button" class="btn btn-secondary">Recargar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;">
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Curso</th>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Año</th>
+                    <th>Inscrito</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="enrollments-tbody">
+                  <tr><td colspan="6" class="empty-state">Sin datos.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast hidden" data-type="info"><span id="toast-message"></span></div>
+    <div id="busy-overlay" class="busy hidden">
+      <div class="box"><span id="busy-label">Procesando...</span></div>
+    </div>
+
+    <script>
+      (() => {
+        const state = {
+          tokens: null,
+          user: null,
+          institutions: [],
+          courses: [],
+          users: [],
+          enrollments: [],
+          grades: [],
+          courseRoster: {},
+          chatSessions: {},
+          selectedInstitutionId: null,
+          selectedCourseId: null,
+          activeForm: null,
+          gradeForm: null,
+          userForm: null,
+          filters: {
+            institution: '',
+            userRole: 'all',
+          },
+          sendingChat: false,
+        };
+
+        const els = {
+          loginView: document.getElementById('login-view'),
+          loginForm: document.getElementById('login-form'),
+          loginError: document.getElementById('login-error'),
+          appRoot: document.getElementById('app-root'),
+          headerUserName: document.getElementById('header-user-name'),
+          headerUserEmail: document.getElementById('header-user-email'),
+          refreshAll: document.getElementById('refresh-all'),
+          logoutBtn: document.getElementById('logout-btn'),
+          institutionsList: document.getElementById('institutions-list'),
+          institutionDetail: document.getElementById('institution-detail'),
+          institutionSearch: document.getElementById('institution-search'),
+          usersTbody: document.getElementById('users-tbody'),
+          usersRoleFilter: document.getElementById('users-role-filter'),
+          userFormContainer: document.getElementById('user-form-container'),
+          gradeFormContainer: document.getElementById('grade-form-container'),
+          gradesTbody: document.getElementById('grades-tbody'),
+          enrollmentsTbody: document.getElementById('enrollments-tbody'),
+          toast: document.getElementById('toast'),
+          toastMessage: document.getElementById('toast-message'),
+          busyOverlay: document.getElementById('busy-overlay'),
+          busyLabel: document.getElementById('busy-label'),
+        };
+
+        let toastTimer = null;
+
+        function init() {
+          bindEvents();
+          restoreSession();
+        }
+
+        function bindEvents() {
+          els.loginForm.addEventListener('submit', handleLoginSubmit);
+          els.logoutBtn.addEventListener('click', logout);
+          els.refreshAll.addEventListener('click', refreshAll);
+          document.getElementById('institution-create-btn').addEventListener('click', () => openInstitutionForm());
+          document.getElementById('institutions-refresh').addEventListener('click', () => {
+            loadInstitutions(true)
+              .then(() => {
+                renderInstitutions();
+                renderInstitutionDetail();
+                showToast('Instituciones actualizadas.', 'success');
+              })
+              .catch(handleError);
+          });
+          els.institutionSearch.addEventListener('input', (event) => {
+            const value = (event.target.value || '').toLowerCase();
+            state.filters = state.filters || {};
+            state.filters.institution = value;
+            renderInstitutions();
+          });
+          els.institutionsList.addEventListener('click', handleInstitutionListClick);
+          els.institutionDetail.addEventListener('click', handleInstitutionDetailAction);
+          document.getElementById('user-create-btn').addEventListener('click', openUserCreateForm);
+          document.getElementById('users-refresh').addEventListener('click', () => {
+            loadUsers(true)
+              .then(() => {
+                renderStats();
+                renderUsers();
+                showToast('Usuarios actualizados.', 'success');
+              })
+              .catch(handleError);
+          });
+          els.usersRoleFilter.addEventListener('change', (event) => {
+            state.filters = state.filters || {};
+            state.filters.userRole = event.target.value;
+            renderUsers();
+          });
+          els.usersTbody.addEventListener('click', handleUsersTableClick);
+          document.getElementById('grade-create-btn').addEventListener('click', () => openGradeForm());
+          document.getElementById('grades-refresh').addEventListener('click', () => {
+            loadGrades(true)
+              .then(() => {
+                renderGrades();
+                renderUserForm();
+                showToast('Grados actualizados.', 'success');
+              })
+              .catch(handleError);
+          });
+          els.gradesTbody.addEventListener('click', handleGradesTableClick);
+          document.getElementById('enrollments-refresh').addEventListener('click', () => {
+            loadEnrollments(true)
+              .then(() => {
+                renderEnrollments();
+                showToast('Matrículas actualizadas.', 'success');
+              })
+              .catch(handleError);
+          });
+          els.enrollmentsTbody.addEventListener('click', handleEnrollmentsTableClick);
+          document.querySelectorAll('.tab-btn').forEach((btn) => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+          });
+        }
+
+        async function handleLoginSubmit(event) {
+          event.preventDefault();
+          const formData = new FormData(event.currentTarget);
+          const email = formData.get('email');
+          const password = formData.get('password');
+          if (!email || !password) return;
+
+          try {
+            setBusy(true, 'Autenticando...');
+            const response = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok || !data) {
+              throw new Error((data && data.msg) || 'Credenciales inválidas');
+            }
+            state.tokens = {
+              access_token: data.access_token,
+              refresh_token: data.refresh_token,
+            };
+            state.user = data.user;
+            saveSession();
+            els.loginError.classList.add('hidden');
+            showApp();
+            await loadInitialData();
+            showToast('¡Bienvenido! Datos cargados correctamente.', 'success');
+          } catch (error) {
+            els.loginError.textContent = error.message || 'No se pudo iniciar sesión.';
+            els.loginError.classList.remove('hidden');
+          } finally {
+            setBusy(false);
+          }
+        }
+
+        function showApp() {
+          els.loginView.classList.add('hidden');
+          els.appRoot.classList.remove('hidden');
+          updateHeader();
+        }
+
+        function showLogin() {
+          els.loginView.classList.remove('hidden');
+          els.appRoot.classList.add('hidden');
+        }
+
+        async function loadInitialData() {
+          try {
+            setBusy(true, 'Cargando datos iniciales...');
+            const profile = await fetchProfile().catch(() => null);
+            if (profile) {
+              state.user = profile;
+              updateHeader();
+            }
+            await Promise.all([
+              loadInstitutions(true),
+              loadGrades(true),
+              loadCourses(true),
+              loadUsers(true),
+              loadEnrollments(true),
+            ]);
+            renderAll();
+          } catch (error) {
+            handleError(error);
+          } finally {
+            setBusy(false);
+          }
+        }
+
+        async function fetchProfile() {
+          return authFetchJSON('/api/auth/profile');
+        }
+
+        function updateHeader() {
+          if (!state.user) return;
+          els.headerUserName.textContent = state.user.username || 'Administrador';
+          els.headerUserEmail.textContent = `${state.user.email || ''} · ${roleLabel(state.user.role || 'admin')}`;
+        }
+
+        function renderAll() {
+          renderStats();
+          renderOverview();
+          renderInstitutions();
+          renderInstitutionDetail();
+          renderGrades();
+          renderGradeForm();
+          renderUsers();
+          renderUserForm();
+          renderEnrollments();
+        }
+
+        function renderStats() {
+          document.getElementById('stat-institutions').textContent = state.institutions.length;
+          document.getElementById('stat-courses').textContent = state.courses.filter((course) => course.is_active !== false).length;
+          const teachers = state.users.filter((user) => user.role === 'teacher').length;
+          const students = state.users.filter((user) => user.role === 'student').length;
+          document.getElementById('stat-teachers').textContent = teachers;
+          document.getElementById('stat-students').textContent = students;
+        }
+
+        function renderOverview() {
+          const instList = document.getElementById('overview-institution-list');
+          const courseList = document.getElementById('overview-course-list');
+          instList.innerHTML = '';
+          courseList.innerHTML = '';
+
+          if (!state.institutions.length) {
+            instList.innerHTML = '<li class="empty-state">Sin registros.</li>';
+          } else {
+            state.institutions.slice(0, 4).forEach((inst) => {
+              const courses = state.courses.filter((course) => course.institution_id === inst.id);
+              const li = document.createElement('li');
+              li.className = 'institution-card';
+              li.style.cursor = 'default';
+              li.innerHTML = `
+                <header>
+                  <div class="institution-logo">${inst.logotipo ? `<img src="${buildAssetUrl(inst.logotipo)}" alt="Logo" />` : initials(inst.nombre)}</div>
+                  <div class="institution-meta">
+                    <h3>${escapeHtml(inst.nombre)}</h3>
+                    <span>${courses.length} cursos · ${inst.direccion ? escapeHtml(inst.direccion) : 'Sin dirección'}</span>
+                  </div>
+                </header>
+              `;
+              instList.appendChild(li);
+            });
+          }
+
+          if (!state.courses.length) {
+            courseList.innerHTML = '<li class="empty-state">Sin registros.</li>';
+          } else {
+            [...state.courses]
+              .sort((a, b) => (b.students_count || 0) - (a.students_count || 0))
+              .slice(0, 4)
+              .forEach((course) => {
+                const li = document.createElement('li');
+                li.className = 'institution-card';
+                li.style.cursor = 'default';
+                li.innerHTML = `
+                  <header>
+                    <div class="institution-logo">${initials(course.nombre)}</div>
+                    <div class="institution-meta">
+                      <h3>${escapeHtml(course.nombre)}</h3>
+                      <span>${course.students_count || 0} estudiantes · ${course.teachers_count || 0} profesores</span>
+                    </div>
+                  </header>
+                `;
+                courseList.appendChild(li);
+              });
+          }
+        }
+
+        function renderInstitutions() {
+          const container = els.institutionsList;
+          container.innerHTML = '';
+
+          if (!state.institutions.length) {
+            container.innerHTML = '<div class="empty-state">Aún no hay instituciones registradas.</div>';
+            return;
+          }
+
+          const query = (state.filters?.institution || '').trim();
+          const filtered = state.institutions.filter((inst) => {
+            if (!query) return true;
+            const haystack = [inst.nombre, inst.direccion].filter(Boolean).join(' ').toLowerCase();
+            return haystack.includes(query.toLowerCase());
+          });
+
+          if (!filtered.length) {
+            container.innerHTML = '<div class="empty-state">No encontramos coincidencias.</div>';
+            return;
+          }
+
+          filtered.forEach((inst) => {
+            const courses = state.courses.filter((course) => course.institution_id === inst.id);
+            const card = document.createElement('article');
+            card.className = `institution-card${state.selectedInstitutionId === inst.id ? ' active' : ''}`;
+            card.dataset.action = 'select-institution';
+            card.dataset.id = String(inst.id);
+            card.innerHTML = `
+              <header>
+                <div class="institution-logo" style="background:${colorMix(inst.colorinstitucional || '#4a3aff', 0.12)};">
+                  ${inst.logotipo ? `<img src="${buildAssetUrl(inst.logotipo)}" alt="Logo" />` : initials(inst.nombre)}
+                </div>
+                <div class="institution-meta">
+                  <h3>${escapeHtml(inst.nombre)}</h3>
+                  <span>${courses.length} cursos · ${inst.direccion ? escapeHtml(inst.direccion) : 'Sin dirección'}</span>
+                </div>
+              </header>
+              <div class="chip-group">
+                ${courses
+                  .slice(0, 3)
+                  .map((course) => `<span class="chip">${escapeHtml(course.nombre)}</span>`)
+                  .join('') || '<span class="chip" style="background:rgba(148,163,184,0.18); color:var(--color-neutral-500);">Sin cursos</span>'}
+                ${courses.length > 3 ? `<span class="chip" style="background:rgba(148,163,184,0.18); color:var(--color-neutral-500);">+${courses.length - 3}</span>` : ''}
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        }
+
+        function renderInstitutionDetail() {
+          const container = els.institutionDetail;
+
+          if (state.activeForm?.type === 'institution') {
+            container.innerHTML = renderInstitutionFormTemplate(state.activeForm.data || null);
+            attachInstitutionFormEvents(state.activeForm.data || null);
+            return;
+          }
+
+          if (state.activeForm?.type === 'course') {
+            container.innerHTML = renderCourseFormTemplate(state.activeForm.data || {});
+            attachCourseFormEvents(state.activeForm.data || {});
+            return;
+          }
+
+          if (state.activeForm?.type === 'assign') {
+            container.innerHTML = renderAssignTeacherFormTemplate(state.activeForm.data);
+            attachAssignTeacherFormEvents(state.activeForm.data);
+            return;
+          }
+
+          if (state.activeForm?.type === 'enroll') {
+            container.innerHTML = renderEnrollStudentsFormTemplate(state.activeForm.data);
+            attachEnrollStudentsFormEvents(state.activeForm.data);
+            return;
+          }
+
+          const institution = state.institutions.find((inst) => inst.id === state.selectedInstitutionId);
+
+          if (!institution) {
+            container.innerHTML = '<div class="detail-card"><div class="empty-state">Selecciona una institución para ver sus detalles.</div></div>';
+            return;
+          }
+
+          const courses = state.courses.filter((course) => course.institution_id === institution.id);
+          const fundacion = formatDate(institution.fundacion);
+          container.innerHTML = `
+            <div class="detail-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                <div>
+                  <h3>${escapeHtml(institution.nombre)}</h3>
+                  <div class="meta-line">
+                    ${institution.direccion ? `<span>📍 ${escapeHtml(institution.direccion)}</span>` : ''}
+                    ${fundacion ? `<span>Fundación: ${fundacion}</span>` : ''}
+                    ${institution.paginaweb ? `<span><a href="${escapeAttr(institution.paginaweb)}" target="_blank" rel="noopener">Sitio web</a></span>` : ''}
+                  </div>
+                  <div class="chip-group">
+                    <span class="badge badge-info">Cursos: ${courses.length}</span>
+                    <span class="badge badge-info">Color: ${institution.colorinstitucional || 'No definido'}</span>
+                  </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                  <button type="button" class="btn btn-secondary btn-sm" data-action="edit-institution" data-id="${institution.id}">Editar</button>
+                </div>
+              </div>
+            </div>
+            <div class="detail-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px;">
+                <h3 style="margin:0;">Cursos</h3>
+                <button type="button" class="btn btn-primary btn-sm" data-action="new-course" data-institution="${institution.id}">Nuevo curso</button>
+              </div>
+              <div class="course-list">
+                ${courses.length ? courses.map((course) => renderCourseCard(course)).join('') : '<div class="empty-state" style="padding:14px 0;">Crea un curso para esta institución.</div>'}
+              </div>
+            </div>
+            <div id="course-roster" class="detail-card"></div>
+            <div id="course-chat" class="chat-card"></div>
+          `;
+
+          renderCourseRoster();
+          renderCourseChat();
+        }
+
+        function renderCourseCard(course) {
+          const isActive = course.is_active !== false;
+          const badge = isActive ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-muted">Inactivo</span>';
+          const excerpt = course.prompt ? truncate(course.prompt, 180) : 'Sin prompt configurado.';
+          const gradeLabel = course.grade?.name ? `🎓 ${escapeHtml(course.grade.name)}` : '🎓 Sin grado';
+          const emoji = escapeHtml(course.emoji || '📘');
+          return `
+            <article class="course-card" data-course-id="${course.id}">
+              <header>
+                <div>
+                  <h4>${emoji} ${escapeHtml(course.nombre)}</h4>
+                  ${badge}
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" data-action="edit-course" data-id="${course.id}">Editar</button>
+              </header>
+              <p style="margin:10px 0 12px; color:var(--color-neutral-500); font-size:0.85rem;">${escapeHtml(excerpt)}</p>
+              <div class="course-meta">
+                <span>${gradeLabel}</span>
+                <span>👩‍🏫 ${course.teachers_count || 0} docentes</span>
+                <span>👥 ${course.students_count || 0} estudiantes</span>
+                <span>📁 ${course.files_count || 0} archivos</span>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
+                <button type="button" class="btn btn-secondary btn-sm" data-action="select-course" data-id="${course.id}">Ver detalle</button>
+                <button type="button" class="btn btn-primary btn-sm" data-action="open-chat" data-id="${course.id}">Probar chat</button>
+              </div>
+            </article>
+          `;
+        }
+
+        function renderCourseRoster() {
+          const container = document.getElementById('course-roster');
+          if (!container) return;
+          const course = state.courses.find((c) => c.id === state.selectedCourseId);
+          if (!course || course.institution_id !== state.selectedInstitutionId) {
+            container.innerHTML = '<div class="empty-state">Selecciona un curso para ver las matrículas asociadas.</div>';
+            return;
+          }
+
+          const roster = state.courseRoster[course.id];
+          if (!roster) {
+            container.innerHTML = '<div class="empty-state">Cargando matrículas...</div>';
+            loadCourseRoster(course.id)
+              .then(() => {
+                if (state.selectedCourseId === course.id) renderCourseRoster();
+              })
+              .catch((error) => {
+                container.innerHTML = `<div class="empty-state" style="color:var(--color-danger);">${escapeHtml(error.message || 'Error al cargar matrícula')}</div>`;
+              });
+            return;
+          }
+
+          const teachers = roster.filter((entry) => entry.role_in_course === 'teacher');
+          const students = roster.filter((entry) => entry.role_in_course === 'student');
+          container.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+              <h3 style="margin:0;">Matrículas · ${escapeHtml(course.nombre)}</h3>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn btn-secondary btn-sm" data-action="assign-teacher" data-course-id="${course.id}">Asignar profesor</button>
+                <button type="button" class="btn btn-primary btn-sm" data-action="enroll-students" data-course-id="${course.id}">Agregar estudiantes</button>
+              </div>
+            </div>
+            <div style="display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+              <div>
+                <h4 style="margin:0 0 10px; font-size:0.92rem; color:var(--color-neutral-500);">Profesores (${teachers.length})</h4>
+                <div class="stack" style="max-height:240px;">
+                  ${teachers.length ? teachers.map((entry) => rosterItem(entry)).join('') : '<div class="empty-state" style="padding:12px 0;">Sin profesores asignados.</div>'}
+                </div>
+              </div>
+              <div>
+                <h4 style="margin:0 0 10px; font-size:0.92rem; color:var(--color-neutral-500);">Estudiantes (${students.length})</h4>
+                <div class="stack" style="max-height:240px;">
+                  ${students.length ? students.map((entry) => rosterItem(entry)).join('') : '<div class="empty-state" style="padding:12px 0;">Sin estudiantes inscritos.</div>'}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        function rosterItem(entry) {
+          const userName = entry.user?.username || 'Usuario';
+          const email = entry.user?.email || '';
+          return `
+            <div class="course-card" style="padding:12px 14px; background:#fff; box-shadow:none; border:1px solid rgba(74,58,255,0.08);">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                <div>
+                  <strong>${escapeHtml(userName)}</strong>
+                  <div style="font-size:0.75rem; color:var(--color-neutral-500);">${escapeHtml(email)}</div>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" data-action="remove-enrollment" data-id="${entry.id}">Quitar</button>
+              </div>
+            </div>
+          `;
+        }
+
+        function renderCourseChat() {
+          const container = document.getElementById('course-chat');
+          if (!container) return;
+          const course = state.courses.find((c) => c.id === state.selectedCourseId);
+          if (!course || course.institution_id !== state.selectedInstitutionId) {
+            container.innerHTML = '<div class="empty-state" style="padding:22px;">Selecciona un curso para probar el chatbot contextual.</div>';
+            return;
+          }
+
+          const institution = state.institutions.find((inst) => inst.id === course.institution_id);
+          if (!state.chatSessions[course.id]) {
+            state.chatSessions[course.id] = [
+              { role: 'bot', content: `Hola, soy el asistente del curso ${course.nombre}. ¿En qué puedo ayudarte?` },
+            ];
+          }
+
+          container.innerHTML = `
+            <div class="chat-header">
+              <h3>Chat del curso · ${escapeHtml(course.nombre)}</h3>
+              <span>${institution ? escapeHtml(institution.nombre) : ''}</span>
+            </div>
+            <div class="chat-controls">
+              <button type="button" class="btn btn-ghost btn-sm" data-action="clear-chat" data-course-id="${course.id}">Limpiar</button>
+            </div>
+            <div class="chat-status" id="chat-status-${course.id}">Listo para conversar</div>
+            <div class="chat-messages" id="chat-messages-${course.id}"></div>
+            <form class="chat-form" data-course-id="${course.id}">
+              <textarea id="chat-input-${course.id}" placeholder="Escribe un mensaje para el asistente..." required></textarea>
+              <button type="submit" class="btn btn-primary" id="chat-send-${course.id}">Enviar</button>
+            </form>
+          `;
+
+          container.querySelector('[data-action="clear-chat"]').addEventListener('click', () => {
+            state.chatSessions[course.id] = [
+              { role: 'bot', content: 'Nueva conversación iniciada. ¿En qué puedo ayudarte?' },
+            ];
+            renderCourseChat();
+          });
+
+          const form = container.querySelector('form');
+          const input = container.querySelector('textarea');
+          const statusEl = document.getElementById(`chat-status-${course.id}`);
+          const sendBtn = container.querySelector('button[type="submit"]');
+
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const text = input.value.trim();
+            if (!text || state.sendingChat) return;
+            const session = state.chatSessions[course.id] || [];
+            session.push({ role: 'user', content: text });
+            state.chatSessions[course.id] = session;
+            input.value = '';
+            renderChatMessages(course.id);
+            await sendChatRequest(course.id, statusEl, sendBtn);
+          });
+
+          renderChatMessages(course.id);
+        }
+
+        function renderChatMessages(courseId) {
+          const container = document.getElementById(`chat-messages-${courseId}`);
+          if (!container) return;
+          const session = state.chatSessions[courseId] || [];
+          container.innerHTML = session
+            .map((message) => `
+              <div class="chat-bubble ${message.role === 'user' ? 'user' : 'bot'}">
+                ${formatChat(message.content)}
+                <small>${message.role === 'user' ? 'Tú' : 'Asistente'}</small>
+              </div>
+            `)
+            .join('');
+          container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChatRequest(courseId, statusEl, sendBtn) {
+          state.sendingChat = true;
+          statusEl.textContent = 'Consultando al asistente...';
+          sendBtn.disabled = true;
+          const session = state.chatSessions[courseId] || [];
+
+          try {
+            const payload = {
+              messages: session.map((message) => ({
+                role: message.role === 'bot' ? 'model' : message.role,
+                content: message.content,
+              })),
+            };
+
+            const response = await authFetch(`/api/courses/${courseId}/chat`, {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            });
+            const data = await parseJson(response);
+            if (!response.ok || !data) throw new Error(data?.msg || 'El chatbot no respondió');
+            const answer = (data.response || '').trim() || 'Sin respuesta del modelo.';
+            session.push({ role: 'bot', content: answer });
+            statusEl.textContent = `Modelo: ${data.model || 'desconocido'}`;
+          } catch (error) {
+            session.push({ role: 'bot', content: `[Error] ${error.message || 'No se obtuvo respuesta.'}` });
+            statusEl.textContent = 'Ocurrió un error al consultar el chatbot.';
+          } finally {
+            state.chatSessions[courseId] = session;
+            renderChatMessages(courseId);
+            state.sendingChat = false;
+            sendBtn.disabled = false;
+          }
+        }
+
+        function handleInstitutionListClick(event) {
+          const card = event.target.closest('[data-action="select-institution"]');
+          if (!card) return;
+          const id = Number(card.dataset.id);
+          if (!Number.isNaN(id)) {
+            state.selectedInstitutionId = id;
+            state.selectedCourseId = null;
+            state.activeForm = null;
+            renderInstitutions();
+            renderInstitutionDetail();
+          }
+        }
+
+        function handleInstitutionDetailAction(event) {
+          const target = event.target.closest('[data-action]');
+          if (!target) return;
+          const action = target.dataset.action;
+
+          switch (action) {
+            case 'edit-institution':
+              openInstitutionForm(state.institutions.find((inst) => inst.id === Number(target.dataset.id)));
+              break;
+            case 'new-course':
+              openCourseForm({ institution_id: Number(target.dataset.institution) });
+              break;
+            case 'select-course':
+              state.selectedCourseId = Number(target.dataset.id);
+              state.activeForm = null;
+              renderInstitutionDetail();
+              break;
+            case 'open-chat':
+              state.selectedCourseId = Number(target.dataset.id);
+              state.activeForm = null;
+              renderInstitutionDetail();
+              const chatContainer = document.getElementById('course-chat');
+              if (chatContainer) {
+                chatContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+              break;
+            case 'edit-course':
+              openCourseForm(state.courses.find((course) => course.id === Number(target.dataset.id)));
+              break;
+            case 'assign-teacher':
+              openAssignTeacherForm(state.courses.find((course) => course.id === Number(target.dataset.courseId)));
+              break;
+            case 'enroll-students':
+              openEnrollStudentsForm(state.courses.find((course) => course.id === Number(target.dataset.courseId)));
+              break;
+            case 'remove-enrollment':
+              removeEnrollment(Number(target.dataset.id));
+              break;
+            case 'clear-chat':
+              break;
+            default:
+              break;
+          }
+        }
+
+        function openInstitutionForm(institution) {
+          state.activeForm = { type: 'institution', data: institution || null };
+          renderInstitutionDetail();
+        }
+
+        function renderInstitutionFormTemplate(institution) {
+          return `
+            <div class="form-card">
+              <header>
+                <h3>${institution ? 'Editar institución' : 'Nueva institución'}</h3>
+                <button type="button" class="btn btn-ghost btn-sm" data-action="cancel-form">Cancelar</button>
+              </header>
+              <form id="institution-form" enctype="multipart/form-data">
+                <div style="display:flex; flex-direction:column; gap:18px;">
+                  <div>
+                    <label for="inst-nombre">Nombre *</label>
+                    <input type="text" id="inst-nombre" name="nombre" required value="${institution ? escapeAttr(institution.nombre) : ''}" />
+                  </div>
+                  <div>
+                    <label for="inst-direccion">Dirección</label>
+                    <input type="text" id="inst-direccion" name="direccion" value="${institution?.direccion ? escapeAttr(institution.direccion) : ''}" />
+                  </div>
+                  <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:160px;">
+                      <label for="inst-fundacion">Fundación</label>
+                      <input type="text" id="inst-fundacion" name="fundacion" placeholder="DD-MM-AAAA" value="${institution?.fundacion ? formatLocalDate(institution.fundacion) : ''}" />
+                      <small style="display:block; margin-top:6px; color:var(--color-neutral-500);">Ej: 21-05-1995</small>
+                    </div>
+                    <div style="flex:1; min-width:160px;">
+                      <label for="inst-color">Color institucional</label>
+                      <input type="color" id="inst-color" name="colorinstitucional" value="${institution?.colorinstitucional || '#4a3aff'}" />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="inst-web">Sitio web</label>
+                    <input type="url" id="inst-web" name="paginaweb" placeholder="https://ejemplo.cl" value="${institution?.paginaweb ? escapeAttr(institution.paginaweb) : ''}" />
+                    <small style="display:block; margin-top:6px; color:var(--color-neutral-500);">Debe incluir http:// o https://</small>
+                  </div>
+                  <div>
+                    <label for="inst-logo">Logotipo</label>
+                    <input type="file" id="inst-logo" name="logotipo" accept="image/*" />
+                    ${institution?.logotipo ? `<small style="display:block; margin-top:6px; color:var(--color-neutral-500);">Actual: ${escapeHtml(institution.logotipo)}</small>` : ''}
+                  </div>
+                </div>
+                <div data-role="form-error" class="error-banner hidden" style="margin-top:12px;"></div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">${institution ? 'Guardar cambios' : 'Crear institución'}</button>
+                </div>
+              </form>
+            </div>
+          `;
+        }
+
+        function attachInstitutionFormEvents(institution) {
+          const form = document.getElementById('institution-form');
+          const cancelBtn = form.parentElement.querySelector('[data-action="cancel-form"]');
+          const errorBox = form.querySelector('[data-role="form-error"]');
+          hideFormError(errorBox);
+          cancelBtn.addEventListener('click', () => {
+            state.activeForm = null;
+            renderInstitutionDetail();
+          });
+
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const dateInput = form.elements['fundacion'];
+            if (dateInput) {
+              const normalized = normalizeDateValue(dateInput.value.trim());
+              if (normalized && normalized !== dateInput.value) {
+                dateInput.value = normalized;
+              }
+            }
+            const rawEntries = Array.from(new FormData(event.currentTarget).entries()).reduce((acc, [k, v]) => {
+              acc[k] = v instanceof File ? v.name : v;
+              return acc;
+            }, {});
+            console.debug('[ACACHAT] Datos crudos institución', rawEntries);
+            const submission = buildFormSubmission(event.currentTarget);
+            if (!(submission.body instanceof FormData)) {
+              console.debug('[ACACHAT] Payload institución (JSON)', submission.body);
+            } else {
+              const preview = {};
+              submission.body.forEach((value, key) => {
+                preview[key] = value instanceof File ? `[File:${value.name}]` : value;
+              });
+              console.debug('[ACACHAT] Payload institución (FormData)', preview);
+            }
+            const url = institution ? `/api/institutions/${institution.id}` : '/api/institutions';
+            const method = institution ? 'PUT' : 'POST';
+
+            try {
+              setBusy(true, institution ? 'Actualizando institución...' : 'Creando institución...');
+              const options = { method, body: submission.body };
+              if (submission.headers) options.headers = submission.headers;
+              const response = await authFetch(url, options);
+              const data = await parseJson(response);
+              if (!response.ok) {
+                const details = parseValidationMessage(data?.msg);
+                const error = new Error(Array.isArray(details?._messages) ? details._messages.join(', ') : (data?.msg || 'No se pudo guardar la institución'));
+                error.details = details;
+                throw error;
+              }
+              await loadInstitutions(true);
+              if (data?.institution?.id) {
+                state.selectedInstitutionId = data.institution.id;
+              }
+              state.activeForm = null;
+              renderInstitutions();
+              renderInstitutionDetail();
+              showToast(institution ? 'Institución actualizada.' : 'Institución creada.', 'success');
+            } catch (error) {
+              if (!handleFormError(error, errorBox)) {
+                handleError(error);
+              }
+            } finally {
+              setBusy(false);
+            }
+          });
+        }
+
+        function openCourseForm(courseOrOptions) {
+          const course = courseOrOptions?.id ? courseOrOptions : null;
+          state.activeForm = {
+            type: 'course',
+            data: courseOrOptions || {},
+          };
+          renderInstitutionDetail();
+        }
+
+        function renderCourseFormTemplate(data) {
+          const isUpdate = Boolean(data?.id);
+          const selectedInstitution = data?.institution_id || state.selectedInstitutionId || (state.institutions[0]?.id || '');
+          const selectedGradeId = data?.grade_id ?? data?.grade?.id ?? null;
+          const gradeField = `
+                  <div>
+                    <label for="course-grade">Grado *</label>
+                    <select id="course-grade" name="grade_id" required ${state.grades.length ? '' : 'disabled'}>
+                      <option value="">Selecciona un grado</option>
+                      ${state.grades
+                        .map((grade) => `<option value="${grade.id}" ${grade.id === selectedGradeId ? 'selected' : ''}>${escapeHtml(grade.name)}</option>`)
+                        .join('')}
+                    </select>
+                    ${state.grades.length ? '' : '<small style="display:block; margin-top:6px; color:var(--color-danger);">Crea un grado antes de asociarlo a un curso.</small>'}
+                  </div>
+          `;
+          return `
+            <div class="form-card">
+              <header>
+                <h3>${isUpdate ? 'Editar curso' : 'Nuevo curso'}</h3>
+                <button type="button" class="btn btn-ghost btn-sm" data-action="cancel-form">Cancelar</button>
+              </header>
+              <form id="course-form">
+                <div style="display:flex; flex-direction:column; gap:18px;">
+                  <div>
+                    <label for="course-name">Nombre *</label>
+                    <input type="text" id="course-name" name="nombre" required value="${data?.nombre ? escapeAttr(data.nombre) : ''}" />
+                  </div>
+                  <div>
+                    <label for="course-emoji">Emoji</label>
+                    <input type="text" id="course-emoji" name="emoji" maxlength="8" placeholder="Ej: 📘" value="${data?.emoji ? escapeAttr(data.emoji) : ''}" />
+                    <small style="display:block; margin-top:6px; color:var(--color-neutral-500);">Este emoji se mostrará en la app móvil.</small>
+                  </div>
+                  <div>
+                    <label for="course-institution">Institución *</label>
+                    <select id="course-institution" name="institution_id" required>
+                      ${state.institutions
+                        .map((inst) => `<option value="${inst.id}" ${inst.id === selectedInstitution ? 'selected' : ''}>${escapeHtml(inst.nombre)}</option>`)
+                        .join('')}
+                    </select>
+                  </div>
+                  ${gradeField}
+                  <div>
+                    <label for="course-prompt">Prompt del chatbot</label>
+                    <textarea id="course-prompt" name="prompt" placeholder="Instrucciones para el asistente">${data?.prompt ? escapeHtml(data.prompt) : ''}</textarea>
+                  </div>
+                  ${isUpdate ? `
+                    <div>
+                      <label for="course-active">Estado</label>
+                      <select id="course-active" name="is_active">
+                        <option value="true" ${data.is_active !== false ? 'selected' : ''}>Activo</option>
+                        <option value="false" ${data.is_active === false ? 'selected' : ''}>Inactivo</option>
+                      </select>
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">${isUpdate ? 'Guardar curso' : 'Crear curso'}</button>
+                </div>
+              </form>
+            </div>
+          `;
+        }
+
+        function attachCourseFormEvents(courseData) {
+          const form = document.getElementById('course-form');
+          const cancelBtn = form.parentElement.querySelector('[data-action="cancel-form"]');
+          cancelBtn.addEventListener('click', () => {
+            state.activeForm = null;
+            renderInstitutionDetail();
+          });
+
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const fd = new FormData(event.currentTarget);
+            const institutionIdRaw = fd.get('institution_id');
+            const gradeIdRaw = fd.get('grade_id');
+            if (!institutionIdRaw || !gradeIdRaw) {
+              showToast('Selecciona institución y grado para el curso.', 'error');
+              return;
+            }
+            const institutionId = Number(institutionIdRaw);
+            const gradeId = Number(gradeIdRaw);
+            if (Number.isNaN(institutionId) || Number.isNaN(gradeId)) {
+              showToast('Selecciona institución y grado válidos.', 'error');
+              return;
+            }
+
+            const emojiValue = (fd.get('emoji') || '').toString().trim();
+            const payload = {
+              nombre: fd.get('nombre'),
+              institution_id: institutionId,
+              grade_id: gradeId,
+              prompt: fd.get('prompt') || null,
+            };
+            if (emojiValue) {
+              payload.emoji = emojiValue;
+            } else if (!isUpdate) {
+              payload.emoji = '📘';
+            }
+            const isUpdate = Boolean(courseData?.id);
+            if (isUpdate) {
+              payload.is_active = fd.get('is_active') === 'true';
+            }
+
+            const url = isUpdate ? `/api/courses/${courseData.id}` : '/api/courses';
+            const method = isUpdate ? 'PUT' : 'POST';
+
+            try {
+              setBusy(true, isUpdate ? 'Actualizando curso...' : 'Creando curso...');
+              const response = await authFetch(url, {
+                method,
+                body: JSON.stringify(payload),
+              });
+              const data = await parseJson(response);
+              if (!response.ok) throw new Error(data?.msg || 'No se pudo guardar el curso');
+              await loadCourses(true);
+              if (data?.course?.id) {
+                state.selectedCourseId = data.course.id;
+              } else if (!isUpdate) {
+                const updated = state.courses.find((c) => c.nombre === payload.nombre && c.institution_id === payload.institution_id);
+                state.selectedCourseId = updated?.id || null;
+              }
+              state.activeForm = null;
+              renderInstitutions();
+              renderInstitutionDetail();
+              showToast(isUpdate ? 'Curso actualizado.' : 'Curso creado.', 'success');
+            } catch (error) {
+              handleError(error);
+            } finally {
+              setBusy(false);
+            }
+          });
+        }
+
+        function openAssignTeacherForm(course) {
+          if (!course) return;
+          state.activeForm = { type: 'assign', data: course };
+          renderInstitutionDetail();
+        }
+
+        function openEnrollStudentsForm(course) {
+          if (!course) return;
+          state.activeForm = { type: 'enroll', data: course };
+          renderInstitutionDetail();
+        }
+
+        function renderAssignTeacherFormTemplate(course) {
+          const teachers = state.users.filter((user) => user.role === 'teacher' || user.role === 'admin');
+          const institution = state.institutions.find((inst) => inst.id === course.institution_id);
+          const institutionId = institution?.id;
+          const institutionName = institution ? institution.nombre : 'la institución';
+
+          const teacherEntries = teachers.map((user) => {
+            const institutions = userInstitutionNames(user.id);
+            const institutionIds = userInstitutionIds(user.id);
+            const inCurrent = institutionId ? institutionIds.has(institutionId) : false;
+            const label = `${escapeHtml(user.username)} · ${institutions.length ? escapeHtml(institutions.join(' / ')) : 'Sin institución'}`;
+            return { user, label, priority: inCurrent ? 0 : 1 };
+          });
+
+          teacherEntries.sort((a, b) => {
+            if (a.priority !== b.priority) return a.priority - b.priority;
+            return a.user.username.localeCompare(b.user.username, 'es', { sensitivity: 'base' });
+          });
+
+          const inInstitutionOptions = teacherEntries
+            .filter((entry) => entry.priority === 0)
+            .map((entry) => `<option value="${entry.user.id}">${entry.label}</option>`) 
+            .join('');
+          const otherOptions = teacherEntries
+            .filter((entry) => entry.priority === 1)
+            .map((entry) => `<option value="${entry.user.id}">${entry.label}</option>`)
+            .join('');
+
+          const selectOptions = [
+            '<option value="">Selecciona un profesor</option>',
+            inInstitutionOptions
+              ? `<optgroup label="Docentes de ${escapeHtml(institutionName)}">${inInstitutionOptions}</optgroup>`
+              : '',
+            otherOptions
+              ? '<optgroup label="Otros docentes / administradores">' + otherOptions + '</optgroup>'
+              : '',
+          ].join('');
+
+          return `
+            <div class="form-card">
+              <header>
+                <h3>Asignar profesor · ${escapeHtml(course.nombre)}</h3>
+                <button type="button" class="btn btn-ghost btn-sm" data-action="cancel-form">Cancelar</button>
+              </header>
+              <form id="assign-teacher-form">
+                <div style="display:flex; flex-direction:column; gap:18px;">
+                  <div>
+                    <label for="assign-teacher">Profesor *</label>
+                    <select id="assign-teacher" name="user_id" required>
+                      ${selectOptions}
+                    </select>
+                  </div>
+                  <div>
+                    <label for="assign-year">Año *</label>
+                    <input type="number" id="assign-year" name="year" min="2000" max="2100" value="${new Date().getFullYear()}" required />
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Asignar profesor</button>
+                </div>
+              </form>
+            </div>
+          `;
+        }
+
+        function attachAssignTeacherFormEvents(course) {
+          const form = document.getElementById('assign-teacher-form');
+          const cancelBtn = form.parentElement.querySelector('[data-action="cancel-form"]');
+          cancelBtn.addEventListener('click', () => {
+            state.activeForm = null;
+            renderInstitutionDetail();
+          });
+
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const fd = new FormData(event.currentTarget);
+            const userId = Number(fd.get('user_id'));
+            const year = Number(fd.get('year'));
+            if (!userId || !year) {
+              showToast('Selecciona un profesor y un año válido.', 'error');
+              return;
+            }
+
+            try {
+              setBusy(true, 'Asignando profesor...');
+              const response = await authFetch('/api/enrollments/assign-teacher', {
+                method: 'POST',
+                body: JSON.stringify({ user_id: userId, course_id: course.id, year }),
+              });
+              const data = await parseJson(response);
+              if (!response.ok) throw new Error(data?.msg || 'No se pudo asignar al profesor');
+              state.courseRoster[course.id] = null;
+              await loadCourseRoster(course.id, { force: true });
+              state.activeForm = null;
+              renderInstitutionDetail();
+              showToast('Profesor asignado correctamente.', 'success');
+            } catch (error) {
+              handleError(error);
+            } finally {
+              setBusy(false);
+            }
+          });
+        }
+
+        function renderEnrollStudentsFormTemplate(course) {
+          const students = state.users.filter((user) => user.role === 'student');
+          const gradeOptions = state.grades
+            .map((grade) => `<option value="${grade.id}" ${course?.grade_id === grade.id ? 'selected' : ''}>${escapeHtml(grade.name)}</option>`)
+            .join('');
+
+          const studentOptions = students
+            .map((student) => `<option value="${student.id}">${escapeHtml(student.username)} · ${escapeHtml(student.email)}</option>`)
+            .join('');
+
+          const currentYear = new Date().getFullYear();
+
+          return `
+            <div class="form-card">
+              <header>
+                <h3>Agregar estudiantes · ${escapeHtml(course.nombre)}</h3>
+                <button type="button" class="btn btn-ghost btn-sm" data-action="cancel-form">Cancelar</button>
+              </header>
+              <form id="enroll-students-form">
+                <div style="display:flex; flex-direction:column; gap:18px;">
+                  <div>
+                    <label for="bulk-year">Año *</label>
+                    <input type="number" id="bulk-year" name="year" min="2000" max="2100" value="${currentYear}" required />
+                  </div>
+                  <div>
+                    <label for="bulk-grade">Agregar todos los estudiantes de un grado</label>
+                    <select id="bulk-grade" name="grade_id">
+                      <option value="">Sin selección</option>
+                      ${gradeOptions}
+                    </select>
+                    <small style="display:block; margin-top:6px; color:var(--color-neutral-500);">Inscribirá a todos los estudiantes activos del grado elegido.</small>
+                  </div>
+                  <div>
+                    <label for="bulk-students">Selecciona estudiantes específicos</label>
+                    <select id="bulk-students" name="user_ids" multiple size="8" ${students.length ? '' : 'disabled'}>
+                      ${students.length ? studentOptions : ''}
+                    </select>
+                    ${students.length
+                      ? '<small style="display:block; margin-top:6px; color:var(--color-neutral-500);">Usa Cmd/Ctrl para seleccionar múltiples estudiantes.</small>'
+                      : '<small style="display:block; margin-top:6px; color:var(--color-danger);">No hay estudiantes registrados.</small>'}
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Inscribir estudiantes</button>
+                </div>
+              </form>
+            </div>
+          `;
+        }
+
+        function attachEnrollStudentsFormEvents(course) {
+          const form = document.getElementById('enroll-students-form');
+          const cancelBtn = form.parentElement.querySelector('[data-action="cancel-form"]');
+          cancelBtn.addEventListener('click', () => {
+            state.activeForm = null;
+            renderInstitutionDetail();
+          });
+
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const fd = new FormData(event.currentTarget);
+            const year = Number(fd.get('year'));
+            if (!Number.isFinite(year)) {
+              showToast('Ingresa un año válido.', 'error');
+              return;
+            }
+
+            const gradeIdRaw = fd.get('grade_id');
+            const gradeId = gradeIdRaw ? Number(gradeIdRaw) : null;
+
+            const userSelect = form.querySelector('#bulk-students');
+            const selectedUserIds = Array.from(userSelect?.selectedOptions || [])
+              .map((option) => Number(option.value))
+              .filter((value) => Number.isFinite(value));
+
+            if (!selectedUserIds.length && !gradeId) {
+              showToast('Selecciona estudiantes específicos o un grado.', 'error');
+              return;
+            }
+
+            const payload = {
+              course_id: course.id,
+              year,
+            };
+
+            if (gradeId) {
+              payload.grade_id = gradeId;
+            }
+
+            if (selectedUserIds.length) {
+              payload.user_ids = selectedUserIds;
+            }
+
+            try {
+              setBusy(true, 'Inscribiendo estudiantes...');
+              const response = await authFetch('/api/enrollments/bulk', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+              });
+              const data = await parseJson(response);
+              if (!response.ok) throw new Error(data?.msg || 'No se pudo inscribir estudiantes');
+
+              await Promise.all([
+                loadCourseRoster(course.id, { force: true }),
+                loadEnrollments(true),
+              ]);
+              state.activeForm = null;
+              renderInstitutionDetail();
+              showToast(data?.msg || 'Estudiantes inscritos correctamente.', 'success');
+            } catch (error) {
+              handleError(error);
+            } finally {
+              setBusy(false);
+            }
+          });
+        }
+
+        function syncEditingContext() {
+          if (state.userForm?.data?.id) {
+            const updatedUser = state.users.find((user) => user.id === state.userForm.data.id);
+            state.userForm = updatedUser ? { ...state.userForm, data: updatedUser } : null;
+          }
+
+          if (state.activeForm?.data?.id && (state.activeForm.type === 'course' || state.activeForm.type === 'assign' || state.activeForm.type === 'enroll')) {
+            const updatedCourse = state.courses.find((course) => course.id === state.activeForm.data.id);
+            state.activeForm = updatedCourse ? { ...state.activeForm, data: updatedCourse } : null;
+          }
+        }
+
+        function renderGrades() {
+          const tbody = els.gradesTbody;
+          if (!tbody) return;
+          tbody.innerHTML = '';
+
+          if (!state.grades.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Aún no hay grados registrados.</td></tr>';
+            return;
+          }
+
+          [...state.grades]
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }))
+            .forEach((grade) => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td>${escapeHtml(grade.name)}</td>
+                <td>${grade.order ?? '—'}</td>
+                <td>${formatDate(grade.created_at)}</td>
+                <td>${formatDate(grade.updated_at)}</td>
+                <td style="text-align:right;">
+                  <button type="button" class="btn btn-ghost btn-sm" data-action="edit-grade" data-id="${grade.id}">Editar</button>
+                  <button type="button" class="btn btn-ghost btn-sm" data-action="delete-grade" data-id="${grade.id}">Eliminar</button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+        }
+
+        function openGradeForm(grade) {
+          state.gradeForm = { mode: grade ? 'edit' : 'create', data: grade || null };
+          renderGradeForm();
+          if (els.gradeFormContainer) {
+            els.gradeFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+
+        function renderGradeForm() {
+          const container = els.gradeFormContainer;
+          if (!container) return;
+          const formState = state.gradeForm;
+
+          if (!formState) {
+            container.classList.add('hidden');
+            container.innerHTML = '';
+            return;
+          }
+
+          const grade = formState.data;
+          container.classList.remove('hidden');
+          container.innerHTML = `
+            <header>
+              <h3>${formState.mode === 'edit' ? `Editar grado · ${escapeHtml(grade.name)}` : 'Nuevo grado'}</h3>
+              <button type="button" class="btn btn-ghost btn-sm" data-action="cancel-grade-form">Cerrar</button>
+            </header>
+            <form id="grade-form">
+              <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                <div style="flex:2; min-width:200px;">
+                  <label>Nombre *</label>
+                  <input type="text" name="name" required value="${grade?.name ? escapeAttr(grade.name) : ''}" />
+                </div>
+                <div style="flex:1; min-width:140px;">
+                  <label>Orden *</label>
+                  <input type="number" name="order" required min="1" max="100" value="${grade?.order ?? ''}" />
+                  <small style="display:block; margin-top:6px; color:var(--color-neutral-500);">Determina el orden ascendente de los grados.</small>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">${formState.mode === 'edit' ? 'Guardar cambios' : 'Crear grado'}</button>
+              </div>
+            </form>
+          `;
+
+          container.querySelector('[data-action="cancel-grade-form"]').addEventListener('click', () => {
+            state.gradeForm = null;
+            renderGradeForm();
+          });
+
+          const form = document.getElementById('grade-form');
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const fd = new FormData(event.currentTarget);
+            const name = fd.get('name')?.toString().trim();
+            const orderValue = fd.get('order');
+            const order = orderValue ? Number(orderValue) : NaN;
+
+            if (!name || Number.isNaN(order)) {
+              showToast('Completa nombre y orden del grado.', 'error');
+              return;
+            }
+
+            const payload = { name, order };
+            const isEdit = formState.mode === 'edit';
+            const gradeId = grade?.id;
+            const url = isEdit && gradeId ? `/api/grades/${gradeId}` : '/api/grades';
+            const method = isEdit ? 'PUT' : 'POST';
+
+            try {
+              setBusy(true, isEdit ? 'Actualizando grado...' : 'Creando grado...');
+              const response = await authFetch(url, {
+                method,
+                body: JSON.stringify(payload),
+              });
+              const data = await parseJson(response);
+              if (!response.ok) throw new Error(data?.msg || 'No se pudo guardar el grado');
+
+              await Promise.all([
+                loadGrades(true),
+                loadCourses(true),
+                loadUsers(true),
+              ]);
+              syncEditingContext();
+              state.gradeForm = null;
+              renderGradeForm();
+              renderAll();
+              showToast(isEdit ? 'Grado actualizado.' : 'Grado creado.', 'success');
+            } catch (error) {
+              handleError(error);
+            } finally {
+              setBusy(false);
+            }
+          });
+        }
+
+        function handleGradesTableClick(event) {
+          const target = event.target.closest('[data-action]');
+          if (!target) return;
+          const action = target.dataset.action;
+          const gradeId = Number(target.dataset.id);
+          if (!Number.isFinite(gradeId)) return;
+
+          if (action === 'edit-grade') {
+            const grade = state.grades.find((g) => g.id === gradeId);
+            if (grade) openGradeForm(grade);
+          } else if (action === 'delete-grade') {
+            deleteGrade(gradeId);
+          }
+        }
+
+        async function deleteGrade(gradeId) {
+          if (!window.confirm('¿Deseas eliminar este grado?')) return;
+          try {
+            setBusy(true, 'Eliminando grado...');
+            const response = await authFetch(`/api/grades/${gradeId}`, { method: 'DELETE' });
+            const data = await parseJson(response);
+            if (!response.ok) throw new Error(data?.msg || 'No se pudo eliminar el grado');
+
+            await Promise.all([
+              loadGrades(true),
+              loadCourses(true),
+              loadUsers(true),
+            ]);
+            syncEditingContext();
+            if (state.gradeForm?.data?.id === gradeId) {
+              state.gradeForm = null;
+            }
+            renderAll();
+            showToast('Grado eliminado.', 'success');
+          } catch (error) {
+            handleError(error);
+          } finally {
+            setBusy(false);
+          }
+        }
+
+        function renderUsers() {
+          const tbody = els.usersTbody;
+          tbody.innerHTML = '';
+
+          if (!state.users.length) {
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No hay usuarios registrados.</td></tr>';
+            return;
+          }
+
+          const roleFilter = state.filters?.userRole || 'all';
+          const filtered = state.users.filter((user) => roleFilter === 'all' || user.role === roleFilter);
+          if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No hay usuarios con ese filtro.</td></tr>';
+            return;
+          }
+
+          filtered.forEach((user) => {
+            const location = [user.comuna, user.region].filter(Boolean).join(', ') || 'Sin ubicación';
+            const institutionName = user.institution?.nombre || '<span style="color:var(--color-neutral-500);">Sin institución</span>';
+            const gradeName = user.grade?.name || '<span style="color:var(--color-neutral-500);">Sin grado</span>';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>
+                <div class="user-meta">
+                  <span class="avatar">${initials(user.username)}</span>
+                  <div>
+                    <strong>${escapeHtml(user.username)}</strong>
+                    <small>${escapeHtml(user.email)}</small>
+                  </div>
+                </div>
+              </td>
+              <td>${escapeHtml(user.rut)}</td>
+              <td><span class="badge badge-info" style="background:rgba(74,58,255,0.12);">${roleLabel(user.role)}</span></td>
+              <td>${institutionName}</td>
+              <td>${gradeName}</td>
+              <td>${escapeHtml(location)}</td>
+              <td>${formatDate(user.created_at)}</td>
+              <td><span class="status ${user.is_active ? 'status-active' : 'status-inactive'}">${user.is_active ? 'Activo' : 'Inactivo'}</span></td>
+              <td style="text-align:right;">
+                <button type="button" class="btn btn-ghost btn-sm" data-action="edit-user" data-id="${user.id}">Editar</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        function renderUserForm() {
+          const container = els.userFormContainer;
+          const formState = state.userForm;
+          if (!formState) {
+            container.classList.add('hidden');
+            container.innerHTML = '';
+            return;
+          }
+
+          const user = formState.data;
+          container.classList.remove('hidden');
+          container.innerHTML = `
+            <header>
+              <h3>${formState.mode === 'edit' ? `Editar usuario · ${escapeHtml(user.username)}` : 'Nuevo usuario'}</h3>
+              <button type="button" class="btn btn-ghost btn-sm" data-action="cancel-user-form">Cerrar</button>
+            </header>
+            <form id="user-form">
+              <div style="display:flex; flex-direction:column; gap:18px;">
+                <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                  <div style="flex:1; min-width:200px;">
+                    <label>Nombre de usuario *</label>
+                    <input type="text" name="username" required value="${user?.username ? escapeAttr(user.username) : ''}" />
+                  </div>
+                  <div style="flex:1; min-width:200px;">
+                    <label>RUT *</label>
+                    <input type="text" name="rut" required value="${user?.rut ? escapeAttr(user.rut) : ''}" ${formState.mode === 'edit' ? 'disabled' : ''} />
+                  </div>
+                </div>
+                <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                  <div style="flex:1; min-width:200px;">
+                    <label>Email *</label>
+                    <input type="email" name="email" required value="${user?.email ? escapeAttr(user.email) : ''}" />
+                  </div>
+                  <div style="flex:1; min-width:200px;">
+                    <label>Rol *</label>
+                    <select name="role" required>
+                      <option value="student" ${user?.role === 'student' ? 'selected' : ''}>Estudiante</option>
+                      <option value="teacher" ${user?.role === 'teacher' ? 'selected' : ''}>Profesor</option>
+                      <option value="admin" ${user?.role === 'admin' ? 'selected' : ''}>Administrador</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                  <div style="flex:1; min-width:200px;">
+                    <label>Región *</label>
+                    <input type="text" name="region" required value="${user?.region ? escapeAttr(user.region) : ''}" />
+                  </div>
+                  <div style="flex:1; min-width:200px;">
+                    <label>Comuna *</label>
+                    <input type="text" name="comuna" required value="${user?.comuna ? escapeAttr(user.comuna) : ''}" />
+                  </div>
+                </div>
+                <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                  <div style="flex:1; min-width:200px;">
+                    <label>Institución</label>
+                    <select name="institution_id">
+                      <option value="">Sin institución</option>
+                      ${state.institutions.map(inst => `<option value="${inst.id}" ${user?.institution_id === inst.id ? 'selected' : ''}>${escapeHtml(inst.nombre)}</option>`).join('')}
+                    </select>
+                  </div>
+                  <div style="flex:1; min-width:200px;">
+                    <label>Grado</label>
+                    <select name="grade_id">
+                      <option value="">Sin grado</option>
+                      ${state.grades.map(grade => `<option value="${grade.id}" ${user?.grade_id === grade.id ? 'selected' : ''}>${escapeHtml(grade.name)}</option>`).join('')}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label>${formState.mode === 'edit' ? 'Nueva contraseña (opcional)' : 'Contraseña *'}</label>
+                  <input type="text" name="password" placeholder="${formState.mode === 'edit' ? 'Deja en blanco para mantenerla' : 'Mínimo 8 caracteres'}" ${formState.mode === 'edit' ? '' : 'required minlength="8"'} />
+                </div>
+                ${formState.mode === 'edit' ? `
+                  <div>
+                    <label>Estado</label>
+                    <select name="is_active">
+                      <option value="true" ${user?.is_active !== false ? 'selected' : ''}>Activo</option>
+                      <option value="false" ${user?.is_active === false ? 'selected' : ''}>Inactivo</option>
+                    </select>
+                  </div>
+                ` : ''}
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">${formState.mode === 'edit' ? 'Guardar cambios' : 'Crear usuario'}</button>
+              </div>
+            </form>
+          `;
+
+          container.querySelector('[data-action="cancel-user-form"]').addEventListener('click', () => {
+            state.userForm = null;
+            renderUserForm();
+          });
+
+          const form = document.getElementById('user-form');
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const fd = new FormData(event.currentTarget);
+            const payload = {
+              username: fd.get('username'),
+              email: fd.get('email'),
+              role: fd.get('role'),
+              region: fd.get('region'),
+              comuna: fd.get('comuna'),
+            };
+            const password = fd.get('password');
+            if (password) payload.password = password;
+
+            // Agregar institution_id y grade_id si están presentes
+            const institutionId = fd.get('institution_id');
+            if (institutionId) payload.institution_id = Number(institutionId);
+
+            const gradeId = fd.get('grade_id');
+            if (gradeId) payload.grade_id = Number(gradeId);
+
+            if (formState.mode === 'edit') {
+              payload.is_active = fd.get('is_active') === 'true';
+            } else {
+              payload.rut = fd.get('rut');
+            }
+
+            try {
+              setBusy(true, formState.mode === 'edit' ? 'Actualizando usuario...' : 'Creando usuario...');
+              const url = formState.mode === 'edit' ? `/api/auth/users/${user.id}` : '/api/auth/register';
+              const method = formState.mode === 'edit' ? 'PUT' : 'POST';
+              const response = await authFetch(url, {
+                method,
+                body: JSON.stringify(payload),
+              });
+              const data = await parseJson(response);
+              if (!response.ok) throw new Error(data?.msg || 'No se pudo guardar el usuario');
+              await loadUsers(true);
+              state.userForm = null;
+              renderUserForm();
+              renderUsers();
+              renderStats();
+              showToast(formState.mode === 'edit' ? 'Usuario actualizado.' : 'Usuario creado.', 'success');
+            } catch (error) {
+              handleError(error);
+            } finally {
+              setBusy(false);
+            }
+          });
+        }
+
+        function openUserCreateForm() {
+          state.userForm = { mode: 'create', data: null };
+          renderUserForm();
+        }
+
+        function handleUsersTableClick(event) {
+          const target = event.target.closest('[data-action="edit-user"]');
+          if (!target) return;
+          const user = state.users.find((u) => u.id === Number(target.dataset.id));
+          if (user) {
+            state.userForm = { mode: 'edit', data: user };
+            renderUserForm();
+            els.userFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+
+        function renderEnrollments() {
+          const tbody = els.enrollmentsTbody;
+          tbody.innerHTML = '';
+          if (!state.enrollments.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aún no hay matrículas registradas.</td></tr>';
+            return;
+          }
+
+          state.enrollments.forEach((enrollment) => {
+            const courseName = enrollment.course?.nombre || `Curso ${enrollment.course_id}`;
+            const userName = enrollment.user?.username || `Usuario ${enrollment.user_id}`;
+            const email = enrollment.user?.email || '';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${escapeHtml(courseName)}</td>
+              <td>
+                <strong>${escapeHtml(userName)}</strong><br />
+                <span style="font-size:0.75rem; color:var(--color-neutral-500);">${escapeHtml(email)}</span>
+              </td>
+              <td><span class="badge badge-info">${roleLabel(enrollment.role_in_course)}</span></td>
+              <td>${enrollment.year}</td>
+              <td>${formatDate(enrollment.enrolled_at)}</td>
+              <td style="text-align:right;">
+                <button type="button" class="btn btn-ghost btn-sm" data-action="remove-enrollment" data-id="${enrollment.id}">Eliminar</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        function handleEnrollmentsTableClick(event) {
+          const target = event.target.closest('[data-action="remove-enrollment"]');
+          if (!target) return;
+          removeEnrollment(Number(target.dataset.id));
+        }
+
+        async function loadInstitutions(force = false) {
+          if (!force && state.institutions.length) return state.institutions;
+          const institutions = [];
+          let page = 1;
+          let pages = 1;
+          do {
+            const data = await authFetchJSON(`/api/institutions?per_page=100&page=${page}`);
+            institutions.push(...(data.institutions || []));
+            pages = data.pages || 1;
+            page += 1;
+          } while (page <= pages);
+          state.institutions = institutions;
+          state.courseRoster = {};
+          if (!state.selectedInstitutionId && institutions.length) {
+            state.selectedInstitutionId = institutions[0].id;
+          }
+          return institutions;
+        }
+
+        async function loadGrades(force = false) {
+          if (!force && state.grades.length) return state.grades;
+          const grades = [];
+          let page = 1;
+          let pages = 1;
+          do {
+            const data = await authFetchJSON(`/api/grades?per_page=100&page=${page}`);
+            grades.push(...(data.grades || []));
+            pages = data.pages || 1;
+            page += 1;
+          } while (page <= pages);
+          state.grades = grades;
+          return grades;
+        }
+
+        async function loadCourses(force = false) {
+          if (!force && state.courses.length) return state.courses;
+          const courses = [];
+          let page = 1;
+          let pages = 1;
+          do {
+            const data = await authFetchJSON(`/api/courses?per_page=100&page=${page}`);
+            courses.push(...(data.courses || []));
+            pages = data.pages || 1;
+            page += 1;
+          } while (page <= pages);
+          state.courses = courses;
+          return courses;
+        }
+
+        async function loadUsers(force = false) {
+          if (!force && state.users.length) return state.users;
+          const users = [];
+          let page = 1;
+          let pages = 1;
+          do {
+            const data = await authFetchJSON(`/api/auth/users?per_page=100&page=${page}`);
+            users.push(...(data.users || []));
+            pages = data.pages || 1;
+            page += 1;
+          } while (page <= pages);
+          state.users = users;
+          return users;
+        }
+
+        async function loadEnrollments(force = false) {
+          if (!force && state.enrollments.length) return state.enrollments;
+          const enrollments = [];
+          let page = 1;
+          let pages = 1;
+          do {
+            const data = await authFetchJSON(`/api/enrollments?per_page=100&page=${page}`);
+            enrollments.push(...(data.enrollments || []));
+            pages = data.pages || 1;
+            page += 1;
+          } while (page <= pages);
+          state.enrollments = enrollments;
+          return enrollments;
+        }
+
+        async function loadCourseRoster(courseId, options = {}) {
+          if (!options.force && state.courseRoster[courseId]) return state.courseRoster[courseId];
+          const data = await authFetchJSON(`/api/enrollments/course/${courseId}`);
+          state.courseRoster[courseId] = data.enrollments || [];
+          return state.courseRoster[courseId];
+        }
+
+        async function removeEnrollment(enrollmentId) {
+          if (!window.confirm('¿Deseas eliminar esta matrícula?')) return;
+          try {
+            setBusy(true, 'Eliminando matrícula...');
+            const response = await authFetch(`/api/enrollments/${enrollmentId}`, { method: 'DELETE' });
+            const data = await parseJson(response);
+            if (!response.ok) throw new Error(data?.msg || 'No se pudo eliminar la matrícula');
+            state.enrollments = state.enrollments.filter((entry) => entry.id !== enrollmentId);
+            Object.keys(state.courseRoster).forEach((courseId) => {
+              const roster = state.courseRoster[courseId];
+              if (Array.isArray(roster)) {
+                state.courseRoster[courseId] = roster.filter((entry) => entry.id !== enrollmentId);
+              }
+            });
+            renderCourseRoster();
+            renderEnrollments();
+            showToast('Matrícula eliminada.', 'success');
+          } catch (error) {
+            handleError(error);
+          } finally {
+            setBusy(false);
+          }
+        }
+
+        async function refreshAll() {
+          try {
+            setBusy(true, 'Actualizando datos...');
+            await Promise.all([
+              loadInstitutions(true),
+              loadGrades(true),
+              loadCourses(true),
+              loadUsers(true),
+              loadEnrollments(true),
+            ]);
+            renderAll();
+            showToast('Datos actualizados.', 'success');
+          } catch (error) {
+            handleError(error);
+          } finally {
+            setBusy(false);
+          }
+        }
+
+        async function authFetch(url, options = {}, allowRetry = true) {
+          const opts = { method: options.method || 'GET', body: options.body };
+          const headers = new Headers(options.headers || {});
+          if (!(opts.body instanceof FormData) && opts.method && opts.method.toUpperCase() !== 'GET' && opts.body !== undefined && !headers.has('Content-Type')) {
+            headers.set('Content-Type', 'application/json');
+          }
+          if (state.tokens?.access_token) {
+            headers.set('Authorization', `Bearer ${state.tokens.access_token}`);
+          }
+          opts.headers = headers;
+          const response = await fetch(url, opts);
+          if (response.status === 401 && allowRetry && state.tokens?.refresh_token) {
+            const refreshed = await refreshTokens();
+            if (refreshed) {
+              return authFetch(url, options, false);
+            }
+          }
+          return response;
+        }
+
+        async function authFetchJSON(url, options = {}) {
+          const response = await authFetch(url, options);
+          const data = await parseJson(response);
+          if (!response.ok) throw new Error(data?.msg || `Error ${response.status}`);
+          return data;
+        }
+
+        async function refreshTokens() {
+          if (!state.tokens?.refresh_token) return false;
+          try {
+            const response = await fetch('/api/auth/refresh', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${state.tokens.refresh_token}` },
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok || !data?.access_token) {
+              clearSession();
+              showLogin();
+              showToast('Sesión expirada. Vuelve a iniciar sesión.', 'error');
+              return false;
+            }
+            state.tokens.access_token = data.access_token;
+            saveSession();
+            return true;
+          } catch (error) {
+            clearSession();
+            showLogin();
+            showToast('No se pudo refrescar la sesión.', 'error');
+            return false;
+          }
+        }
+
+        function saveSession() {
+          localStorage.setItem('acachat-admin-session', JSON.stringify({ tokens: state.tokens, user: state.user }));
+        }
+
+        function clearSession() {
+          state.tokens = null;
+          state.user = null;
+          localStorage.removeItem('acachat-admin-session');
+        }
+
+        function restoreSession() {
+          try {
+            const raw = localStorage.getItem('acachat-admin-session');
+            if (!raw) {
+              showLogin();
+              return;
+            }
+            const stored = JSON.parse(raw);
+            if (stored?.tokens?.access_token && stored?.tokens?.refresh_token) {
+              state.tokens = stored.tokens;
+              state.user = stored.user || null;
+              showApp();
+              loadInitialData().catch(handleError);
+            } else {
+              showLogin();
+            }
+          } catch {
+            showLogin();
+          }
+        }
+
+        function logout() {
+          clearSession();
+          state.institutions = [];
+          state.courses = [];
+          state.users = [];
+          state.enrollments = [];
+          state.courseRoster = {};
+          state.chatSessions = {};
+          state.selectedInstitutionId = null;
+          state.selectedCourseId = null;
+          state.activeForm = null;
+          state.userForm = null;
+          showLogin();
+          showToast('Sesión cerrada.', 'info');
+        }
+
+        function hideFormError(errorBox) {
+          if (!errorBox) return;
+          errorBox.classList.add('hidden');
+          errorBox.innerHTML = '';
+        }
+
+        function handleFormError(error, errorBox) {
+          if (!errorBox) return false;
+          const details = error.details || parseValidationMessage(error.message);
+          if (!details) return false;
+          const messages = [];
+          Object.entries(details).forEach(([field, value]) => {
+            if (field === '_messages') return;
+            const label = fieldLabel(field);
+            const list = Array.isArray(value) ? value : [value];
+            messages.push(`<div><strong>${escapeHtml(label)}:</strong> ${escapeHtml(list.join(', '))}</div>`);
+          });
+          if (!messages.length && Array.isArray(details._messages)) {
+            messages.push(`<div>${escapeHtml(details._messages.join(', '))}</div>`);
+          }
+          if (!messages.length) return false;
+          errorBox.innerHTML = messages.join('');
+          errorBox.classList.remove('hidden');
+          showToast('Corrige los errores del formulario.', 'error');
+          return true;
+        }
+
+        function buildFormSubmission(form) {
+          const original = new FormData(form);
+          const textEntries = {};
+          const fileEntries = [];
+          let hasFile = false;
+
+          original.forEach((value, key) => {
+            if (value instanceof File) {
+              if (value && value.name) {
+                hasFile = true;
+                fileEntries.push([key, value]);
+              }
+              return;
+            }
+            if (typeof value === 'string') {
+              const trimmed = value.trim();
+              if (trimmed !== '') {
+                textEntries[key] = key === 'fundacion' ? normalizeDateValue(trimmed) : trimmed;
+              }
+            } else if (value !== null && value !== undefined && value !== '') {
+              textEntries[key] = value;
+            }
+          });
+
+          if (hasFile) {
+            const formData = new FormData();
+            Object.entries(textEntries).forEach(([key, value]) => formData.append(key, value));
+            fileEntries.forEach(([key, file]) => formData.append(key, file));
+            return { body: formData };
+          }
+
+          return {
+            body: JSON.stringify(textEntries),
+            headers: { 'Content-Type': 'application/json' },
+          };
+        }
+
+        function parseValidationMessage(message) {
+          if (!message || typeof message !== 'string') return null;
+          const trimmed = message.trim();
+          if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+            return { _messages: [trimmed] };
+          }
+          try {
+            const normalized = trimmed
+              .replace(/'/g, '"')
+              .replace(/None/g, 'null')
+              .replace(/True/g, 'true')
+              .replace(/False/g, 'false');
+            return JSON.parse(normalized);
+          } catch {
+            return { _messages: [message] };
+          }
+        }
+
+        function fieldLabel(field) {
+          const map = {
+            nombre: 'Nombre',
+            direccion: 'Dirección',
+            fundacion: 'Fecha de fundación',
+            paginaweb: 'Sitio web',
+            logotipo: 'Logotipo',
+            colorinstitucional: 'Color institucional',
+          };
+          return map[field] || field;
+        }
+
+        function normalizeDateValue(value) {
+          if (!value) return value;
+          if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return value;
+          }
+          const match = value.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+          if (match) {
+            const [, dd, mm, yyyy] = match;
+            const day = dd.padStart(2, '0');
+            const month = mm.padStart(2, '0');
+            if (isValidDateParts(yyyy, month, day)) {
+              return `${yyyy}-${month}-${day}`;
+            }
+          }
+          const iso = new Date(value);
+          if (!Number.isNaN(iso.getTime())) {
+            const year = iso.getFullYear();
+            const month = String(iso.getMonth() + 1).padStart(2, '0');
+            const day = String(iso.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+          }
+          return value;
+        }
+
+        function formatLocalDate(value) {
+          if (!value) return '';
+          const iso = normalizeDateValue(value);
+          const match = iso && iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          if (!match) return value;
+          const [, yyyy, mm, dd] = match;
+          return `${dd}-${mm}-${yyyy}`;
+        }
+
+        function isValidDateParts(year, month, day) {
+          const y = Number(year);
+          const m = Number(month);
+          const d = Number(day);
+          if (!y || !m || !d) return false;
+          if (m < 1 || m > 12) return false;
+          if (d < 1 || d > 31) return false;
+          const date = new Date(Date.UTC(y, m - 1, d));
+          return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+        }
+
+        function setBusy(isBusy, message) {
+          if (isBusy) {
+            if (message) els.busyLabel.textContent = message;
+            els.busyOverlay.classList.remove('hidden');
+          } else {
+            els.busyOverlay.classList.add('hidden');
+          }
+        }
+
+        function showToast(message, type = 'info') {
+          if (!els.toast) return;
+          els.toastMessage.textContent = message;
+          els.toast.dataset.type = type;
+          els.toast.classList.remove('hidden');
+          requestAnimationFrame(() => {
+            els.toast.classList.add('visible');
+          });
+          if (toastTimer) clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => {
+            els.toast.classList.remove('visible');
+            toastTimer = setTimeout(() => {
+              els.toast.classList.add('hidden');
+            }, 250);
+          }, 3200);
+        }
+
+        function handleError(error) {
+          console.error(error);
+          showToast(error.message || 'Ocurrió un error inesperado.', 'error');
+        }
+
+        async function parseJson(response) {
+          const text = await response.text();
+          if (!text) return null;
+          try {
+            return JSON.parse(text);
+          } catch {
+            return null;
+          }
+        }
+
+        function escapeHtml(value) {
+          if (value === null || value === undefined) return '';
+          return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        }
+
+        function escapeAttr(value) {
+          return escapeHtml(value).replace(/`/g, '&#96;');
+        }
+
+        function initials(value) {
+          if (!value) return '??';
+          const parts = value.trim().split(/\s+/);
+          const first = parts[0]?.[0] || '';
+          const second = parts[1]?.[0] || '';
+          return (first + second).toUpperCase() || value.slice(0, 2).toUpperCase();
+        }
+
+        function userInstitutionMap(userId) {
+          const map = new Map();
+          state.enrollments.forEach((enrollment) => {
+            const enrolledUserId = enrollment.user?.id ?? enrollment.user_id;
+            if (enrolledUserId === userId && enrollment.course?.institution) {
+              const inst = enrollment.course.institution;
+              map.set(inst.id, inst.nombre);
+            }
+          });
+          return map;
+        }
+
+        function userInstitutionNames(userId) {
+          return Array.from(userInstitutionMap(userId).values());
+        }
+
+        function userInstitutionIds(userId) {
+          return new Set(userInstitutionMap(userId).keys());
+        }
+
+        function formatDate(isoString) {
+          if (!isoString) return '—';
+          const date = new Date(isoString);
+          if (Number.isNaN(date.getTime())) return '—';
+          return date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function truncate(text, limit = 140) {
+          if (!text) return '';
+          return text.length > limit ? `${text.slice(0, limit)}…` : text;
+        }
+
+        function roleLabel(role) {
+          switch (role) {
+            case 'admin':
+              return 'Administrador';
+            case 'teacher':
+              return 'Profesor';
+            case 'student':
+              return 'Estudiante';
+            default:
+              return role;
+          }
+        }
+
+        function colorMix(hex, alpha) {
+          if (!hex) return `rgba(74, 58, 255, ${alpha})`;
+          const normalized = hex.replace('#', '');
+          const full = normalized.length === 3 ? normalized.split('').map((c) => c + c).join('') : normalized;
+          const num = parseInt(full, 16);
+          const r = (num >> 16) & 255;
+          const g = (num >> 8) & 255;
+          const b = num & 255;
+          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function buildAssetUrl(path) {
+          if (!path) return '';
+          if (/^https?:\/\//i.test(path)) return path;
+          return `/uploads/${path}`.replace(/\\/g, '/');
+        }
+
+        function formatChat(content) {
+          return escapeHtml(content || '').replace(/\n/g, '<br />');
+        }
+
+        function switchTab(tabName) {
+          document.querySelectorAll('.tab-btn').forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.tab === tabName);
+          });
+          document.querySelectorAll('.tab-pane').forEach((pane) => {
+            pane.classList.toggle('active', pane.id === `tab-${tabName}`);
+          });
+
+          if (tabName === 'users' && !state.users.length) {
+            loadUsers(true)
+              .then(() => {
+                renderStats();
+                renderUsers();
+              })
+              .catch(handleError);
+          }
+          if (tabName === 'grades' && !state.grades.length) {
+            loadGrades(true)
+              .then(() => {
+                renderGrades();
+              })
+              .catch(handleError);
+          }
+          if (tabName === 'enrollments' && !state.enrollments.length) {
+            loadEnrollments(true)
+              .then(renderEnrollments)
+              .catch(handleError);
+          }
+        }
+
+        init();
+      })();
+    </script>
+  </body>
+</html>
