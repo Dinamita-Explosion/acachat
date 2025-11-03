@@ -143,14 +143,11 @@
 > - El correo tiene que terminar con @[dominio].[tdl].
 
 - **Colegio Inglés de Quillota**
-  - Admin: `matias.diaz.c01@mail.pucv.cl` / `Admin1234`
   - Profesor: `matias.diaz@colegioinglesquillota.cl` / `Profesor1234`
   - Estudiante: `alumno1@inglesquillota.cl` / `Alumno1234`
 - **Liceo Gastronomía y Turismo**
-  - Admin: `giovanni.ahumada.t@mail.pucv.cl` / `Admin1234`
   - Profesor: `giovanni.ahumada@lgt.cl` / `Profesor1234`
   - Estudiante: `alumno1@turismo.cl` / `Alumno1234`
 - **Instituto Rafael Ariztía**
-  - Admin: `daniel.saavedra.e@mail.pucv.cl` / `Admin1234`
   - Profesor: `daniel.saavedra@ira.cl` / `Profesor1234`
   - Estudiante: `alumno1@maristas.cl` / `Alumno1234`
