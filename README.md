@@ -97,6 +97,10 @@
 
 ## Backend
 
+> [!NOTE]
+> - Para la entrega parcial 2 solo está habilitado el uso de MySQL en el backend.
+> - Para cambiar el URL de la API en Frontend editar: `src/environments/environment.ts`.
+
 ### Preparación en macOS / Linux
 1. `cd backend`
 2. Crear y activar entorno virtual: `python3 -m venv venv && source venv/bin/activate`
@@ -106,10 +110,9 @@
    ```bash
    mysql -u <usuario> -p -e "DROP DATABASE IF EXISTS acachat_db; CREATE DATABASE acachat_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
    ```
-6. Exportar app de Flask: `export FLASK_APP=app:create_app`
-7. Aplicar migraciones: `flask db upgrade`
-8. Poblar datos de ejemplo (usuarios, cursos, archivos y logos): `python3 seed_data.py`
-9. Levantar el backend: `python3 run.py` (o `flask run` si prefieres)
+6. Aplicar migraciones: `flask db upgrade`
+7. Poblar datos de ejemplo (usuarios, cursos, archivos y logos): `python3 seed_data.py`
+8. Levantar el backend: `python3 run.py` (o `flask run` si prefieres)
 
 ### Preparación en Windows (PowerShell)
 1. `cd backend`
@@ -121,10 +124,9 @@
    ```powershell
    mysql -u <usuario> -p -e "DROP DATABASE IF EXISTS acachat_db; CREATE DATABASE acachat_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
    ```
-7. Definir app de Flask: `$env:FLASK_APP = 'app:create_app'`
-8. Migraciones: `flask db upgrade`
-9. Seed con datos y archivos ficticios: `python seed_data.py`
-10. Iniciar API: `python run.py`
+7. Migraciones: `flask db upgrade`
+8. Seed con datos y archivos ficticios: `python seed_data.py`
+9. Iniciar API: `python run.py`
 
 > El seeder copia automáticamente los logos desde `backend/seeder/` a `uploads/institutions/logos/` y crea material de apoyo en `uploads/courses/<id>/` para que el chatbot tenga contexto desde el primer arranque.
 
@@ -133,6 +135,13 @@
 ![Diagrama ER](./diagram_db.png)
 
 ### Credenciales de ejemplo
+
+> [!CAUTION]
+> Al momento de registrar un nuevo usuario, se tiene que tener en cuenta que: 
+> - El rut tiene que ser uno real validado con digito verificador y guión.
+> - La contraseña tiene que tener aunque sea un mayúscula y mínimo de digitos de 8 además de el uso de números.
+> - El correo tiene que terminar con @[dominio].[tdl].
+
 - **Colegio Inglés de Quillota**
   - Admin: `matias.diaz.c01@mail.pucv.cl` / `Admin1234`
   - Profesor: `matias.diaz@colegioinglesquillota.cl` / `Profesor1234`
