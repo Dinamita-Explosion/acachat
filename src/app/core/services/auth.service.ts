@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, map, throwError } from 'rxjs';
 import { API_BASE_URL } from '../tokens/api.token';
 import { ThemeService } from './theme.service';
-import { AuthUser, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, StoredSession } from '../models/auth.models';
+import { AuthUser, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, StoredSession, ChangePasswordRequest, ChangePasswordResponse } from '../models/auth.models';
+import { CoursesService } from './courses.service';
 
 const STORAGE_KEY = 'acachat.auth.session';
 
@@ -12,6 +13,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly theme = inject(ThemeService);
+  private readonly courses = inject(CoursesService);
   private readonly session$ = new BehaviorSubject<StoredSession | null>(this.readSession());
 
   /** Observable con el usuario autenticado */
@@ -40,6 +42,10 @@ export class AuthService {
     return this.http.post<RegisterResponse>(`${this.apiBaseUrl}/auth/register`, payload);
   }
 
+  changePassword(payload: ChangePasswordRequest): Observable<ChangePasswordResponse> {
+    return this.http.post<ChangePasswordResponse>(`${this.apiBaseUrl}/auth/change-password`, payload);
+  }
+
   updateProfile(changes: { username: string }): Observable<AuthUser> {
     const session = this.session$.value;
     if (!session) {
@@ -56,6 +62,7 @@ export class AuthService {
     localStorage.removeItem(STORAGE_KEY);
     this.session$.next(null);
     this.theme.applyPrimaryColor(null);
+    this.courses.clearCache();
   }
 
   getAccessToken(): string | null {

@@ -10,6 +10,8 @@ import { ThemedButtonComponent } from '../../components/themed-button/themed-but
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
 import { LoginRequest } from '../../core/models/auth.models';
+import { validateEmail, validatePassword } from '../../core/utils/form-validators';
+import { extractErrorMessage } from '../../core/utils/http-error.utils';
 
 @Component({
   selector: 'app-login',
@@ -35,13 +37,20 @@ export class LoginPage {
   private readonly auth = inject(AuthService);
 
   onLogin() {
+    this.errorMessage = '';
+
+    const validationError = this.validateForm();
+    if (validationError) {
+      this.errorMessage = validationError;
+      return;
+    }
+
     const loginData = {
-      email: this.email,
+      email: this.email.trim(),
       password: this.password,
     } satisfies LoginRequest;
 
     this.isLoading = true;
-    this.errorMessage = '';
 
     this.auth
       .login(loginData)
@@ -60,46 +69,25 @@ export class LoginPage {
   goToRegister() {
     this.router.navigate(['/auth/register']);
   }
-}
 
-function extractErrorMessage(error: unknown): string | null {
-  if (!error) return null;
-  const err: any = error;
-  const raw = err?.error?.msg ?? err?.message ?? err?.statusText;
-  if (!raw) return null;
-  if (typeof raw === 'string') {
-    return normalizeErrorString(raw);
+  goToChangePassword() {
+    this.router.navigate(['/auth/change-password']);
   }
-  if (Array.isArray(raw)) {
-    return raw.map(item => (typeof item === 'string' ? item : JSON.stringify(item))).join(' ');
-  }
-  if (typeof raw === 'object') {
-    return Object.values(raw)
-      .flat()
-      .map((item) => (typeof item === 'string' ? item : JSON.stringify(item)))
-      .join(' ');
-  }
-  return null;
-}
 
-function normalizeErrorString(message: string): string {
-  const trimmed = message.trim();
-  if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
-    return trimmed;
-  }
-  try {
-    const parsed = JSON.parse(
-      trimmed
-        .replace(/'/g, '"')
-        .replace(/None/g, 'null')
-        .replace(/True/g, 'true')
-        .replace(/False/g, 'false'),
-    );
-    return Object.values(parsed)
-      .flat()
-      .map((item: unknown) => (typeof item === 'string' ? item : JSON.stringify(item)))
-      .join(' ');
-  } catch {
-    return trimmed;
+  private validateForm(): string | null {
+    const email = this.email.trim();
+    if (!email) {
+      return 'El email es obligatorio.';
+    }
+    if (!validateEmail(email)) {
+      return 'Ingresa un email válido.';
+    }
+
+    const passwordError = validatePassword(this.password, { enforceComplexity: false });
+    if (passwordError) {
+      return passwordError;
+    }
+
+    return null;
   }
 }

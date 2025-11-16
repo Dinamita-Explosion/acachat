@@ -9,6 +9,7 @@ import { AuthService } from '../core/services/auth.service';
 import { ThemeService, ThemePalette } from '../core/services/theme.service';
 import { API_BASE_URL } from '../core/tokens/api.token';
 import { buildInitials, resolveUploadedAssetUrl } from '../core/utils/display.utils';
+import { extractErrorMessage } from '../core/utils/http-error.utils';
 import { combineLatest, firstValueFrom, map } from 'rxjs';
 import { AuthUser } from '../core/models/auth.models';
 import { AlertController, ToastController } from '@ionic/angular';
@@ -161,12 +162,4 @@ function buildLocation(user: AuthUser | null): string {
   }
   const parts = [user.comuna, user.region].filter(Boolean);
   return parts.length ? parts.join(', ') : 'Ubicación no disponible';
-}
-
-function extractErrorMessage(error: unknown): string | null {
-  if (!error) {
-    return null;
-  }
-  const err = error as { error?: { msg?: string }; message?: string };
-  return err?.error?.msg ?? err?.message ?? null;
 }

@@ -1,0 +1,14 @@
+node_modules
+dist
+www
+.git
+.gitignore
+backend/venv
+backend/uploads/*
+backup_db.sql
+**/__pycache__
+**/*.pyc
+frontend/dist
+tmp
+.env
+backend/.env

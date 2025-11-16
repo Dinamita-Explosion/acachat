@@ -1,5 +1,5 @@
 """Schemas de validación usando Marshmallow."""
-from marshmallow import Schema, fields, validates, ValidationError, validate
+from marshmallow import Schema, fields, validates, ValidationError, validate, validates_schema
 from .utils.validators import validate_rut, validate_password_strength
 import re
 
@@ -115,6 +115,37 @@ class ProfileUpdateSchema(Schema):
             "required": "El nombre de usuario es obligatorio"
         }
     )
+
+
+class PasswordChangeSchema(Schema):
+    """Schema para cambio de contraseña usando email y contraseña actual."""
+
+    email = fields.Email(required=True, error_messages={
+        "required": "El email es obligatorio",
+        "invalid": "El email no es válido"
+    })
+    old_password = fields.Str(
+        required=True,
+        load_only=True,
+        error_messages={"required": "La contraseña actual es obligatoria"}
+    )
+    new_password = fields.Str(
+        required=True,
+        load_only=True,
+        error_messages={"required": "La nueva contraseña es obligatoria"}
+    )
+
+    @validates("new_password")
+    def validate_new_password(self, value):
+        is_valid, error_message = validate_password_strength(value)
+        if not is_valid:
+            raise ValidationError(error_message)
+
+    @validates_schema
+    def ensure_passwords_differ(self, data, **_):
+        if data.get('old_password') and data.get('new_password'):
+            if data['old_password'] == data['new_password']:
+                raise ValidationError("La nueva contraseña debe ser distinta a la actual.")
 
 
 class LoginSchema(Schema):

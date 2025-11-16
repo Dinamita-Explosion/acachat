@@ -171,6 +171,10 @@ def chat_with_course(course_id):
     if not course:
         raise ResourceNotFoundError("Curso no encontrado")
 
+    # Si el curso está deshabilitado, solo profesores o administradores pueden usar el chat
+    if not course.is_active and user.is_student():
+        raise AuthorizationError("El chat de este curso fue deshabilitado temporalmente por el docente.")
+
     # Validar body
     data = request.get_json()
     if not data or 'messages' not in data:

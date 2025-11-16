@@ -95,11 +95,30 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS%20v4.0-06B6D4?style=flat&logo=tailwind-css&logoColor=white)](#)
 </div>
 
+## Despliegue con Docker
+
+> Requisitos: Docker Engine 24+ y Docker Compose Plugin.
+
+1. Copia el archivo `backend/.env.docker` (ya incluye valores por defecto) y actualiza las llaves `SECRET_KEY`, `JWT_SECRET_KEY` y `GEMINI_API_KEY` antes de desplegar en producción.
+2. Construye y levanta toda la pila (MySQL + API + SPA con Nginx):
+   ```bash
+   docker compose up --build
+   ```
+3. (Opcional) Pobla datos de ejemplo ejecutando el seeder una sola vez:
+   ```bash
+   docker compose run --rm -e RUN_SEED=true backend python seed_data.py
+   ```
+4. La base de datos y los archivos subidos se conservan en los volúmenes `db_data` y `uploads_data`. Si necesitas un reinicio limpio elimina esos volúmenes manualmente.
+5. Accede al frontend en [http://localhost:8100](http://localhost:8100) y a la API —si deseas probarla directamente— en [http://localhost:5001/api](http://localhost:5001/api).
+
+El frontend se sirve con Nginx y cualquier llamada a `/api/*` se enruta automáticamente al contenedor backend, evitando configuraciones extra de CORS. Puedes publicar las imágenes resultantes en tu registry y desplegarlas en el servidor que prefieras.
+
 ## Backend
 
 > [!NOTE]
 > - Para la entrega parcial 2 solo está habilitado el uso de MySQL en el backend.
 > - Para cambiar el URL de la API en Frontend editar: `src/environments/environment.ts`.
+> - La build de Docker reemplaza automáticamente ese archivo por `src/environments/environment.docker.ts`, que ya apunta a `/api`.
 
 ### Preparación en macOS / Linux
 1. `cd backend`

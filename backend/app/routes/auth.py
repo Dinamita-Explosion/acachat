@@ -34,7 +34,8 @@ from ..schemas import (
     LoginSchema,
     UserSchema,
     UpdateRoleSchema,
-    ProfileUpdateSchema
+    ProfileUpdateSchema,
+    PasswordChangeSchema,
 )
 from ..exceptions import (
     ValidationError,
@@ -55,6 +56,7 @@ login_schema = LoginSchema()
 user_schema = UserSchema()
 update_role_schema = UpdateRoleSchema()
 profile_update_schema = ProfileUpdateSchema()
+password_change_schema = PasswordChangeSchema()
 
 
 @auth_bp.route("/health", methods=["GET"])
@@ -252,6 +254,35 @@ def login():
         "refresh_token": refresh_token,
         "user": user_schema.dump(user)
     }), 200
+
+
+@auth_bp.route("/change-password", methods=["POST"])
+def change_password():
+    """Permite actualizar la contraseña usando email y contraseña actual."""
+
+    try:
+        data = password_change_schema.load(request.get_json())
+    except MarshmallowValidationError as e:
+        current_app.logger.warning(f"Error de validación en cambio de contraseña: {e.messages}")
+        raise ValidationError(str(e.messages))
+
+    email = data["email"].lower()
+    user = User.query.filter_by(email=email, is_active=True).first()
+
+    if not user or not user.check_password(data['old_password']):
+        current_app.logger.warning(f"Intento de cambio de contraseña fallido para {email}")
+        raise AuthenticationError("Las credenciales proporcionadas no son válidas")
+
+    user.set_password(data['new_password'])
+
+    try:
+        db.session.commit()
+        current_app.logger.info(f"Usuario {user.email} actualizó su contraseña")
+        return jsonify({"msg": "Contraseña actualizada correctamente"}), 200
+    except Exception as exc:
+        db.session.rollback()
+        current_app.logger.error(f"Error al actualizar contraseña: {exc}")
+        raise DatabaseError("No se pudo actualizar la contraseña")
 
 
 @auth_bp.route("/refresh", methods=["POST"])

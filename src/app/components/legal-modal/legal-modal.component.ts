@@ -1,4 +1,4 @@
- import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -57,8 +57,7 @@ export class LegalModalComponent implements OnChanges {
   @Output() closed = new EventEmitter<void>();
 
   html = '<p>Cargando…</p>';
-
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['isOpen'] || changes['src']) && this.isOpen && this.src) {

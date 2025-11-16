@@ -29,6 +29,7 @@ export interface CourseDto {
   students_count?: number;
   files_count?: number;
   emoji?: string | null;
+  is_active?: boolean;
 }
 
 export interface CourseEnrollment {
@@ -43,6 +44,23 @@ export interface CourseEnrollment {
 
 interface MyCoursesResponse {
   enrollments: CourseEnrollment[];
+}
+
+export interface CourseEnrollmentUser {
+  id: number;
+  username: string;
+  email?: string;
+  role?: 'student' | 'teacher' | 'admin';
+}
+
+export interface CourseEnrollmentWithUser extends CourseEnrollment {
+  user?: CourseEnrollmentUser | null;
+}
+
+export interface CourseEnrollmentsResponse {
+  course: CourseDto;
+  enrollments: CourseEnrollmentWithUser[];
+  total: number;
 }
 
 export interface CourseFileDto {
@@ -83,6 +101,7 @@ export class CoursesService {
   private readonly courses$ = new BehaviorSubject<CourseEnrollment[]>([]);
   private cache: CourseEnrollment[] | null = null;
   private inFlight$: Observable<CourseEnrollment[]> | null = null;
+  private requestToken = 0;
 
   /**
    * Devuelve un observable con la lista de cursos del usuario actual.
@@ -104,16 +123,22 @@ export class CoursesService {
     }
 
     if (!this.inFlight$) {
+      const token = ++this.requestToken;
       this.inFlight$ = this.http
         .get<MyCoursesResponse>(`${this.apiBaseUrl}/courses/my-courses`)
         .pipe(
           map((response) => response.enrollments ?? []),
           tap((enrollments) => {
+            if (token !== this.requestToken) {
+              return;
+            }
             this.cache = enrollments;
             this.courses$.next(enrollments);
           }),
           finalize(() => {
-            this.inFlight$ = null;
+            if (token === this.requestToken) {
+              this.inFlight$ = null;
+            }
           }),
           shareReplay(1),
         );
@@ -130,6 +155,13 @@ export class CoursesService {
   setMyCourses(enrollments: CourseEnrollment[]): void {
     this.cache = enrollments;
     this.courses$.next(enrollments);
+  }
+
+  clearCache(): void {
+    this.requestToken++;
+    this.cache = null;
+    this.courses$.next([]);
+    this.inFlight$ = null;
   }
 
   uploadCourseFile(courseId: number, file: File) {
@@ -159,5 +191,10 @@ export class CoursesService {
     return this.http
       .delete<{ msg?: string }>(`${this.apiBaseUrl}/files/${fileId}`)
       .pipe(map(() => void 0));
+  }
+
+  listCourseEnrollments(courseId: number, roleInCourse?: 'student' | 'teacher'): Observable<CourseEnrollmentsResponse> {
+    const options = roleInCourse ? { params: { role_in_course: roleInCourse } } : {};
+    return this.http.get<CourseEnrollmentsResponse>(`${this.apiBaseUrl}/enrollments/course/${courseId}`, options);
   }
 }

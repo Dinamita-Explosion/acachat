@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { IonButton, IonContent, IonFooter, IonIcon, IonInput, IonModal } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonFooter, IonIcon, IonInput, IonModal, IonToggle } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline, settingsOutline, cloudUpload, saveOutline } from 'ionicons/icons';
+import { send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline, settingsOutline, cloudUpload, saveOutline, refreshOutline } from 'ionicons/icons';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
@@ -24,6 +24,14 @@ interface ChatMessage {
 
 type ChatNavKey = 'title' | 'subtitle' | 'color' | 'emoji';
 
+interface StudentView {
+  id: number;
+  name: string;
+  email: string;
+  year: number;
+  enrolledAt: string | null;
+}
+
 @Component({
   selector: 'app-chat',
   templateUrl: 'chat.page.html',
@@ -38,6 +46,7 @@ type ChatNavKey = 'title' | 'subtitle' | 'color' | 'emoji';
     IonIcon,
     IonInput,
     IonModal,
+    IonToggle,
   ],
 })
 export class ChatPage {
@@ -86,9 +95,16 @@ export class ChatPage {
   uploadError: string | null = null;
   isDeletingFileId: number | null = null;
   courseConfigName: string | null = null;
+  isChatEnabledForStudents = true;
+  isUpdatingChatAvailability = false;
+  chatAvailabilityFeedback: string | null = null;
+  chatAvailabilityError: string | null = null;
+  students: StudentView[] = [];
+  isStudentsLoading = false;
+  studentsError: string | null = null;
 
   constructor() {
-    addIcons({ send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline, settingsOutline, cloudUpload, saveOutline });
+    addIcons({ send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline, settingsOutline, cloudUpload, saveOutline, refreshOutline });
 
     const state = (this.router.getCurrentNavigation()?.extras?.state ??
       window.history.state) as Record<string, unknown> | undefined;
@@ -202,6 +218,7 @@ export class ChatPage {
     this.isConfigLoading = true;
     this.isFilesLoading = true;
     this.configError = null;
+    this.chatAvailabilityError = null;
 
     try {
       const [course, filesResponse] = await Promise.all([
@@ -213,6 +230,10 @@ export class ChatPage {
       this.promptDraft = course.prompt ?? '';
       this.originalPrompt = this.promptDraft;
       this.files = filesResponse.files ?? [];
+      this.isChatEnabledForStudents = course.is_active !== false;
+      this.chatAvailabilityFeedback = this.buildChatAvailabilityFeedback();
+      this.chatAvailabilityError = null;
+      void this.loadCourseStudents();
     } catch (error) {
       console.error('Error al cargar configuración del curso', error);
       this.configError = this.resolveErrorMessage(error, 'No se pudo cargar la configuración del curso.');
@@ -308,6 +329,38 @@ export class ChatPage {
     });
   }
 
+  onChatAvailabilityChange(event: CustomEvent<{ checked: boolean }>) {
+    if (!this.courseId) {
+      return;
+    }
+
+    const nextValue = event.detail.checked;
+    const previousValue = this.isChatEnabledForStudents;
+
+    this.isChatEnabledForStudents = nextValue;
+    this.isUpdatingChatAvailability = true;
+    this.chatAvailabilityError = null;
+
+    this.coursesService.updateCourse(this.courseId, { is_active: nextValue }).subscribe({
+      next: (course) => {
+        this.isChatEnabledForStudents = course.is_active !== false;
+        this.chatAvailabilityFeedback = this.buildChatAvailabilityFeedback();
+        this.isUpdatingChatAvailability = false;
+      },
+      error: (error) => {
+        console.error('Error al actualizar disponibilidad del chat', error);
+        this.chatAvailabilityError = this.resolveErrorMessage(error, 'No se pudo actualizar la disponibilidad del chat.');
+        this.isChatEnabledForStudents = previousValue;
+        this.isUpdatingChatAvailability = false;
+        this.chatAvailabilityFeedback = this.buildChatAvailabilityFeedback();
+      },
+    });
+  }
+
+  refreshStudentsList() {
+    void this.loadCourseStudents();
+  }
+
   private async refreshFiles() {
     if (!this.courseId) {
       return;
@@ -322,6 +375,39 @@ export class ChatPage {
     } finally {
       this.isFilesLoading = false;
     }
+  }
+
+  private async loadCourseStudents(): Promise<void> {
+    if (!this.courseId) {
+      this.students = [];
+      return;
+    }
+
+    this.isStudentsLoading = true;
+    this.studentsError = null;
+
+    try {
+      const response = await firstValueFrom(this.coursesService.listCourseEnrollments(this.courseId, 'student'));
+      this.students = (response.enrollments ?? []).map((enrollment) => ({
+        id: enrollment.id,
+        name: enrollment.user?.username ?? 'Sin nombre',
+        email: enrollment.user?.email ?? 'Sin correo',
+        year: enrollment.year,
+        enrolledAt: enrollment.enrolled_at,
+      }));
+    } catch (error) {
+      console.error('Error al cargar estudiantes del curso', error);
+      this.studentsError = this.resolveErrorMessage(error, 'No se pudieron obtener los estudiantes inscritos.');
+      this.students = [];
+    } finally {
+      this.isStudentsLoading = false;
+    }
+  }
+
+  private buildChatAvailabilityFeedback(): string {
+    return this.isChatEnabledForStudents
+      ? 'Los estudiantes inscritos pueden conversar con el chatbot normalmente.'
+      : 'El chat permanece visible solo para docentes y administradores hasta que lo habilites de nuevo.';
   }
 
   handleBack() {

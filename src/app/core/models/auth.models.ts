@@ -69,3 +69,13 @@ export interface StoredSession {
   tokens: AuthTokens;
   user: AuthUser;
 }
+
+export interface ChangePasswordRequest {
+  email: string;
+  old_password: string;
+  new_password: string;
+}
+
+export interface ChangePasswordResponse {
+  msg: string;
+}

@@ -87,6 +87,29 @@
         <section>
           <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
             <div>
+              <h3 class="text-sm font-semibold text-neutral-800">Disponibilidad del chat</h3>
+              <p class="text-xs text-neutral-500">
+                Controla si los estudiantes pueden abrir el chat. Los docentes y administradores siempre mantienen acceso.
+              </p>
+            </div>
+            <ion-toggle
+              color="primary"
+              [checked]="isChatEnabledForStudents"
+              [disabled]="isUpdatingChatAvailability"
+              (ionChange)="onChatAvailabilityChange($event)"
+            ></ion-toggle>
+          </div>
+          <p *ngIf="chatAvailabilityFeedback" class="text-xs text-neutral-600">
+            {{ chatAvailabilityFeedback }}
+          </p>
+          <p *ngIf="chatAvailabilityError" class="text-xs text-red-600">
+            {{ chatAvailabilityError }}
+          </p>
+        </section>
+
+        <section>
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <div>
               <h3 class="text-sm font-semibold text-neutral-800">Archivos del curso</h3>
               <p class="text-xs text-neutral-500">
                 Los archivos parseados se añaden automáticamente al contexto del chatbot.
@@ -149,6 +172,51 @@
               </div>
             </div>
           </ng-container>
+        </section>
+
+        <section>
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-semibold text-neutral-800">Estudiantes inscritos</h3>
+              <p class="text-xs text-neutral-500">
+                Vista rápida de quiénes tienen acceso al chat de este curso.
+              </p>
+            </div>
+            <ion-button size="small" fill="outline" (click)="refreshStudentsList()" [disabled]="isStudentsLoading">
+              <ion-icon slot="start" name="refresh-outline"></ion-icon>
+              {{ isStudentsLoading ? 'Actualizando…' : 'Actualizar' }}
+            </ion-button>
+          </div>
+
+          <div *ngIf="studentsError" class="mb-3 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">
+            {{ studentsError }}
+          </div>
+
+          <div *ngIf="isStudentsLoading" class="text-xs text-neutral-500">
+            Cargando estudiantes...
+          </div>
+
+          <div *ngIf="!isStudentsLoading">
+            <div *ngIf="students.length === 0" class="rounded-xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-6 text-center text-xs text-neutral-500">
+              Aún no hay estudiantes inscritos en este curso.
+            </div>
+
+            <div *ngIf="students.length" class="space-y-2">
+              <div
+                *ngFor="let student of students"
+                class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm"
+              >
+                <div class="min-w-0 flex-1">
+                  <p class="font-medium text-neutral-800">{{ student.name }}</p>
+                  <p class="truncate text-xs text-neutral-500">{{ student.email }}</p>
+                </div>
+                <div class="text-right text-xs text-neutral-500">
+                  <p>Año {{ student.year }}</p>
+                  <p>{{ student.enrolledAt ? (student.enrolledAt | date: 'dd/MM/yyyy') : 'Sin fecha' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </div>

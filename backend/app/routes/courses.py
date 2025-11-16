@@ -16,6 +16,7 @@ Endpoints:
 from flask import Blueprint, request, jsonify, current_app
 from marshmallow import ValidationError as MarshmallowValidationError
 from flask_jwt_extended import jwt_required
+from sqlalchemy.orm import joinedload
 
 from .. import db
 from ..models import Course, Institution, Grade, UserCourse
@@ -143,7 +144,7 @@ def my_courses():
     role_in_course = request.args.get('role_in_course')
 
     # Query de inscripciones
-    query = UserCourse.query.filter_by(user_id=user.id)
+    query = UserCourse.query.filter_by(user_id=user.id).options(joinedload(UserCourse.course))
 
     if year:
         query = query.filter_by(year=year)
@@ -152,6 +153,12 @@ def my_courses():
         query = query.filter_by(role_in_course=role_in_course)
 
     enrollments = query.order_by(UserCourse.enrolled_at.desc()).all()
+
+    if user.is_student():
+        enrollments = [
+            enrollment for enrollment in enrollments
+            if not enrollment.course or enrollment.course.is_active
+        ]
 
     return jsonify({
         "enrollments": [enrollment.to_dict(include_course=True) for enrollment in enrollments]

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "ng build",
+    "build:docker": "ng build --configuration docker",
     "build:es": "ng build --localize=es",
     "build:en": "ng build --localize=en",
     "build:all": "ng build --localize",
