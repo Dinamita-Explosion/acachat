@@ -30,6 +30,7 @@ export interface CourseDto {
   files_count?: number;
   emoji?: string | null;
   is_active?: boolean;
+  chat_hidden_for_students?: boolean;
 }
 
 export interface CourseEnrollment {
@@ -91,6 +92,7 @@ export type CourseUpdatePayload = Partial<{
   institution_id: number;
   grade_id: number | null;
   is_active: boolean;
+  chat_hidden_for_students: boolean;
 }>;
 
 @Injectable({ providedIn: 'root' })

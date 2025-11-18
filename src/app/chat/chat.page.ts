@@ -102,6 +102,9 @@ export class ChatPage {
   students: StudentView[] = [];
   isStudentsLoading = false;
   studentsError: string | null = null;
+  isStudentUser = false;
+  chatDisabledForCurrentUser = false;
+  studentChatNotice: string | null = null;
 
   constructor() {
     addIcons({ send, trashOutline, ellipsisHorizontal, chevronBack, downloadOutline, copyOutline, settingsOutline, cloudUpload, saveOutline, refreshOutline });
@@ -119,6 +122,7 @@ export class ChatPage {
     }
 
     const currentUser = this.auth.getCurrentUser();
+    this.isStudentUser = currentUser?.role === 'student';
 
     if (currentUser?.role === 'admin') {
       this.canManageCourse = true;
@@ -128,6 +132,10 @@ export class ChatPage {
     }
 
     this.buildMenuActions();
+
+    if (this.courseId) {
+      void this.loadInitialCourseState();
+    }
   }
 
   openOptions(event: Event) {
@@ -208,6 +216,23 @@ export class ChatPage {
     this.isConfigOpen = false;
   }
 
+  private async loadInitialCourseState(): Promise<void> {
+    if (!this.courseId) {
+      return;
+    }
+
+    try {
+      const course = await firstValueFrom(this.coursesService.getCourseById(this.courseId));
+      this.isChatEnabledForStudents = course.chat_hidden_for_students !== true;
+      this.recomputeChatAvailabilityStates();
+      if ((!this.headerTitle || this.headerTitle === 'Chatbot') && course.nombre) {
+        this.headerTitle = course.nombre;
+      }
+    } catch (error) {
+      console.error('Error al obtener la información inicial del curso', error);
+    }
+  }
+
   private async loadCourseConfiguration(): Promise<void> {
     if (!this.courseId) {
       this.configError = 'No se pudo determinar el curso.';
@@ -230,9 +255,9 @@ export class ChatPage {
       this.promptDraft = course.prompt ?? '';
       this.originalPrompt = this.promptDraft;
       this.files = filesResponse.files ?? [];
-      this.isChatEnabledForStudents = course.is_active !== false;
-      this.chatAvailabilityFeedback = this.buildChatAvailabilityFeedback();
+      this.isChatEnabledForStudents = course.chat_hidden_for_students !== true;
       this.chatAvailabilityError = null;
+      this.recomputeChatAvailabilityStates();
       void this.loadCourseStudents();
     } catch (error) {
       console.error('Error al cargar configuración del curso', error);
@@ -340,11 +365,12 @@ export class ChatPage {
     this.isChatEnabledForStudents = nextValue;
     this.isUpdatingChatAvailability = true;
     this.chatAvailabilityError = null;
+    this.recomputeChatAvailabilityStates();
 
-    this.coursesService.updateCourse(this.courseId, { is_active: nextValue }).subscribe({
+    this.coursesService.updateCourse(this.courseId, { chat_hidden_for_students: !nextValue }).subscribe({
       next: (course) => {
-        this.isChatEnabledForStudents = course.is_active !== false;
-        this.chatAvailabilityFeedback = this.buildChatAvailabilityFeedback();
+        this.isChatEnabledForStudents = course.chat_hidden_for_students !== true;
+        this.recomputeChatAvailabilityStates();
         this.isUpdatingChatAvailability = false;
       },
       error: (error) => {
@@ -352,7 +378,7 @@ export class ChatPage {
         this.chatAvailabilityError = this.resolveErrorMessage(error, 'No se pudo actualizar la disponibilidad del chat.');
         this.isChatEnabledForStudents = previousValue;
         this.isUpdatingChatAvailability = false;
-        this.chatAvailabilityFeedback = this.buildChatAvailabilityFeedback();
+        this.recomputeChatAvailabilityStates();
       },
     });
   }
@@ -407,7 +433,16 @@ export class ChatPage {
   private buildChatAvailabilityFeedback(): string {
     return this.isChatEnabledForStudents
       ? 'Los estudiantes inscritos pueden conversar con el chatbot normalmente.'
-      : 'El chat permanece visible solo para docentes y administradores hasta que lo habilites de nuevo.';
+      : 'El chat permanece oculto y solo los docentes/administradores pueden verlo hasta que lo habilites.';
+  }
+
+  private recomputeChatAvailabilityStates(): void {
+    this.chatAvailabilityFeedback = this.buildChatAvailabilityFeedback();
+    const hiddenForStudents = this.isStudentUser && !this.isChatEnabledForStudents;
+    this.chatDisabledForCurrentUser = hiddenForStudents;
+    this.studentChatNotice = hiddenForStudents
+      ? 'El docente ocultó temporalmente este chat para los estudiantes. Podrás retomarlo cuando lo habiliten de nuevo.'
+      : null;
   }
 
   handleBack() {
@@ -427,6 +462,9 @@ export class ChatPage {
     if (this.isSending) return;
     const text = this.draft?.trim();
     if (!text) return;
+    if (this.chatDisabledForCurrentUser) {
+      return;
+    }
     this.messages = [
       ...this.messages,
       { id: Date.now(), from: 'user', text, time: this.now() },
@@ -456,6 +494,10 @@ export class ChatPage {
       this.updateBotText(botId, '\n\n[Error] No se logró identificar el curso. Vuelve a abrirlo desde la lista.');
       return;
     }
+    if (this.chatDisabledForCurrentUser) {
+      this.updateBotText(botId, '\n\n[Info] El chat está oculto temporalmente por el docente.');
+      return;
+    }
 
     const payloadMessages = this.buildBackendMessages();
     if (payloadMessages.length === 0) {
@@ -481,7 +523,16 @@ export class ChatPage {
         },
         error: (error) => {
           console.error('Error al hablar con el chatbot del curso', error);
-          this.updateBotText(botId, '\n\n[Error] No se pudo completar la respuesta. Intenta nuevamente en unos segundos.');
+          const resolvedError = this.resolveErrorMessage(error, 'No se pudo completar la respuesta. Intenta nuevamente en unos segundos.');
+          this.updateBotText(botId, `\n\n[Error] ${resolvedError}`);
+          if (this.isStudentUser) {
+            const lowered = resolvedError.toLowerCase();
+            if (lowered.includes('ocult') || lowered.includes('deshabil')) {
+              this.isChatEnabledForStudents = false;
+              this.recomputeChatAvailabilityStates();
+              this.studentChatNotice = resolvedError;
+            }
+          }
           this.isSending = false;
         },
       });

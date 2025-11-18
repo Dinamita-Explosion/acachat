@@ -1,8 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TopbarComponent } from '../../components/topbar/topbar.component';
 import { CourseCardComponent } from '../../components/course-card/course-card.component';
 import { AuthService } from '../../core/services/auth.service';
@@ -49,7 +51,14 @@ export class Tab2Page {
   );
 
   constructor() {
-    void this.coursesService.loadMyCourses().catch(() => undefined);
+    this.refreshCourses(false);
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        filter((event) => event.urlAfterRedirects.startsWith('/tabs/tab2')),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.refreshCourses(true));
   }
 
   goToProfile() {
@@ -72,10 +81,13 @@ export class Tab2Page {
   private mapCourse(enrollment: CourseEnrollment, palette: ThemePalette, user: AuthUser | null): CourseCardView {
     const course = enrollment.course;
     const institution = course?.institution ?? null;
-    const color = institution?.colorinstitucional?.trim() || palette.primary;
+    const isTeacher = enrollment.role_in_course === 'teacher';
+    const chatHiddenForStudents = course?.chat_hidden_for_students === true;
+    const isStudentUser = user?.role === 'student';
+    const isDisabledForUser = chatHiddenForStudents && (isStudentUser || isTeacher);
+    const color = isDisabledForUser ? '#cbd5f5' : institution?.colorinstitucional?.trim() || palette.primary;
     const logo = resolveUploadedAssetUrl(this.apiBaseUrl, institution?.logotipo ?? null);
     const badge = course?.emoji ?? buildCourseBadge(course?.nombre ?? '');
-    const isTeacher = enrollment.role_in_course === 'teacher';
     const isAdmin = user?.role === 'admin';
     const gradeLabel = course?.grade?.name ?? 'Sin grado asignado';
     const institutionName = institution?.nombre ?? 'Sin institución';
@@ -108,6 +120,9 @@ export class Tab2Page {
     return enrollments;
   }
 
+  private refreshCourses(force: boolean): void {
+    void this.coursesService.loadMyCourses(force).catch(() => undefined);
+  }
 }
 
 interface CourseCardView {

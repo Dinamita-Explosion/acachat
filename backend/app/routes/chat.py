@@ -175,6 +175,10 @@ def chat_with_course(course_id):
     if not course.is_active and user.is_student():
         raise AuthorizationError("El chat de este curso fue deshabilitado temporalmente por el docente.")
 
+    # Si el docente ocultó el chat solo para estudiantes, bloquearlos
+    if course.chat_hidden_for_students and user.is_student():
+        raise AuthorizationError("El chat de este curso está oculto temporalmente para los estudiantes.")
+
     # Validar body
     data = request.get_json()
     if not data or 'messages' not in data:

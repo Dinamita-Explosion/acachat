@@ -210,6 +210,7 @@ class Course(db.Model):
         db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
     is_active = db.Column(db.Boolean, default=True, nullable=False)  # Soft delete
+    chat_hidden_for_students = db.Column(db.Boolean, default=False, nullable=False)
 
     # Relaciones
     institution = db.relationship('Institution', back_populates='courses')
@@ -243,7 +244,8 @@ class Course(db.Model):
             "grade": self.grade.to_dict() if self.grade else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "is_active": self.is_active
+            "is_active": self.is_active,
+            "chat_hidden_for_students": self.chat_hidden_for_students
         }
 
         if include_institution and self.institution:

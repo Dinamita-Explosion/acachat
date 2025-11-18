@@ -312,6 +312,7 @@ class CourseUpdateSchema(Schema):
     institution_id = fields.Int()
     grade_id = fields.Int()
     is_active = fields.Bool()
+    chat_hidden_for_students = fields.Bool()
 
 
 class CourseSchema(Schema):
@@ -331,6 +332,7 @@ class CourseSchema(Schema):
     files_count = fields.Int(dump_only=True)
     students_count = fields.Int(dump_only=True)
     teachers_count = fields.Int(dump_only=True)
+    chat_hidden_for_students = fields.Bool(dump_only=True)
 
 
 # ==========================================

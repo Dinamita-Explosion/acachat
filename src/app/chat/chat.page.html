@@ -18,6 +18,13 @@
     </div>
 
     <div
+      *ngIf="studentChatNotice"
+      class="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-xs text-amber-900"
+    >
+      {{ studentChatNotice }}
+    </div>
+
+    <div
       *ngFor="let msg of messages"
       class="flex"
       [class.justify-end]="msg.from === 'user'"
@@ -256,6 +263,7 @@
           [clearInput]="true"
           placeholder="Escribe un mensaje..."
           class="w-full bg-transparent"
+          [disabled]="chatDisabledForCurrentUser"
           [style.--highlight-color-focused]="'transparent'"
           [style.--highlight-color]="'transparent'"
           [style.--border-color]="'transparent'"
@@ -267,7 +275,7 @@
       <!-- Send circular -->
       <ion-button
         (click)="sendMessage()"
-        [disabled]="!(draft && draft.trim()) || isSending"
+        [disabled]="!(draft && draft.trim()) || isSending || chatDisabledForCurrentUser"
         [style.--border-radius]="'9999px'"
         [style.--padding-start]="'0'"
         [style.--padding-end]="'0'"

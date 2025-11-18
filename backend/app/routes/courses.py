@@ -289,6 +289,7 @@ def update_course(course_id):
         - institution_id: int (opcional)
         - grade_id: int (opcional)
         - is_active: bool (opcional, solo admin)
+        - chat_hidden_for_students: bool (opcional, profesores/admins)
 
     Headers:
         Authorization: Bearer <access_token>
@@ -337,6 +338,9 @@ def update_course(course_id):
     # Solo admins pueden cambiar is_active
     if "is_active" in data and user.is_admin():
         course.is_active = data["is_active"]
+
+    if "chat_hidden_for_students" in data:
+        course.chat_hidden_for_students = data["chat_hidden_for_students"]
 
     try:
         db.session.commit()
